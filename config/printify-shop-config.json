@@ -1,0 +1,72 @@
+{
+  "shop": {
+    "id": 22732326,
+    "title": "NoTrumpNWay",
+    "sales_channel": "custom_integration",
+    "description": "Political greeting cards and merchandise store specializing in anti-Trump content and progressive political messaging",
+    "currency": "USD",
+    "country": "US",
+    "language": "en",
+    "timezone": "America/New_York",
+    "settings": {
+      "auto_fulfill": false,
+      "auto_approve": false,
+      "send_shipping_notification": true,
+      "send_order_confirmation": true,
+      "inventory_tracking": true,
+      "tax_calculation": "automatic",
+      "shipping_calculation": "automatic"
+    },
+    "branding": {
+      "logo_url": "/images/logo.png",
+      "primary_color": "#0070f3",
+      "secondary_color": "#1a365d",
+      "accent_color": "#e53e3e"
+    },
+    "contact": {
+      "email": "support@notrumpnway.com",
+      "phone": "+1-555-0123",
+      "address": {
+        "line1": "123 Democracy Street",
+        "line2": "Suite 456",
+        "city": "Washington",
+        "state": "DC",
+        "zip": "20001",
+        "country": "US"
+      }
+    },
+    "policies": {
+      "return_policy": "30-day return policy for defective items",
+      "shipping_policy": "Standard shipping 5-7 business days, Express 2-3 business days",
+      "privacy_policy": "We protect your privacy and never share personal information",
+      "terms_of_service": "By purchasing, you agree to our terms and conditions"
+    }
+  },
+  "webhook_endpoints": [
+    {
+      "url": "https://notrumpnway.vercel.app/api/webhooks/printify/order-created",
+      "events": ["order:created", "order:updated", "order:shipped"]
+    },
+    {
+      "url": "https://notrumpnway.vercel.app/api/webhooks/printify/product-updated",
+      "events": ["product:created", "product:updated", "product:deleted"]
+    }
+  ],
+  "api_configuration": {
+    "base_url": "https://api.printify.com/v1",
+    "shop_id": 22732326,
+    "authentication": {
+      "type": "bearer_token",
+      "token_env_var": "PRINTIFY_API_TOKEN"
+    },
+    "rate_limits": {
+      "requests_per_minute": 120,
+      "burst_limit": 20
+    },
+    "retry_policy": {
+      "max_retries": 3,
+      "backoff_strategy": "exponential",
+      "initial_delay_ms": 1000
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "create_shop_payload": {
+    "title": "NoTrumpNWay",
+    "sales_channel": "custom_integration",
+    "description": "Political greeting cards and merchandise store",
+    "currency": "USD",
+    "country": "US",
+    "language": "en",
+    "timezone": "America/New_York"
+  },
+  "update_shop_payload": {
+    "id": 22732326,
+    "title": "NoTrumpNWay",
+    "sales_channel": "custom_integration",
+    "description": "Political greeting cards and merchandise store specializing in anti-Trump content and progressive political messaging",
+    "currency": "USD",
+    "country": "US",
+    "language": "en",
+    "timezone": "America/New_York",
+    "settings": {
+      "auto_fulfill": false,
+      "auto_approve": false,
+      "send_shipping_notification": true,
+      "send_order_confirmation": true
+    }
+  },
+  "webhook_configuration": {
+    "url": "https://notrumpnway.vercel.app/api/webhooks/printify",
+    "events": [
+      "order:created",
+      "order:updated",
+      "order:shipped",
+      "order:canceled",
+      "product:created",
+      "product:updated",
+      "product:deleted"
+    ],
+    "secret": "webhook_secret_key_here"
+  },
+  "product_creation_payload": {
+    "title": "Sample Political Card",
+    "description": "High-quality political greeting card",
+    "blueprint_id": 384,
+    "print_provider_id": 1,
+    "variants": [
+      {
+        "id": 45740,
+        "price": 1299,
+        "is_enabled": true
+      }
+    ],
+    "print_areas": [
+      {
+        "variant_ids": [45740],
+        "placeholders": [
+          {
+            "position": "front",
+            "images": [
+              {
+                "id": "image_id_here",
+                "x": 0.5,
+                "y": 0.5,
+                "scale": 1,
+                "angle": 0
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "tags": ["political", "greeting-card", "anti-trump"]
+  },
+  "order_creation_payload": {
+    "external_id": "order_12345",
+    "label": "NoTrumpNWay Order",
+    "line_items": [
+      {
+        "product_id": "product_id_here",
+        "variant_id": 45740,
+        "quantity": 1
+      }
+    ],
+    "shipping_method": 1,
+    "send_shipping_notification": true,
+    "address_to": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "customer@example.com",
+      "phone": "+1-555-0123",
+      "country": "US",
+      "region": "CA",
+      "address1": "123 Main Street",
+      "address2": "Apt 4B",
+      "city": "Los Angeles",
+      "zip": "90210"
+    }
+  }
+}
