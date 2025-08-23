@@ -1,277 +1,286 @@
-﻿'use client'
+﻿"use client"
 
-import React from 'react'
-import { useCart } from '@/contexts/cart-context'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, ShoppingCart } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-
-export const dynamic = "force-dynamic"
+import { useCart } from "@/contexts/cart-context"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import Image from "next/image"
+import Link from "next/link"
+import { ArrowLeft, ShoppingCart, Minus, Plus, Trash2, Heart, Star } from "lucide-react"
 
 export default function CartPage() {
-  const cartData = useCart()
-  const items = cartData?.items || []
-  const updateQuantity = cartData?.updateQuantity
-  const removeFromCart = cartData?.removeFromCart
-  const clearCart = cartData?.clearCart
-  const getTotalPrice = cartData?.getTotalPrice
-  const getCartItemCount = cartData?.getCartItemCount
+  const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart()
 
-  const formatPrice = (price: number | string): string => {
-    const numPrice: number = typeof price === 'number' ? price : parseFloat(price as string) || 0
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(numPrice)
-  }
+  const subtotal = getTotalPrice()
+  const shipping = subtotal > 50 ? 0 : 9.99
+  const tax = subtotal * 0.08
+  const total = subtotal + shipping + tax
 
-  const handleUpdateQuantity = (productId: string, variantId: string, newQuantity: number) => {
+  const handleQuantityChange = (productId: string, variantId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      removeFromCart && removeFromCart(productId, variantId)
+      removeFromCart(productId, variantId)
     } else {
-      updateQuantity && updateQuantity(productId, variantId, newQuantity)
+      updateQuantity(productId, variantId, newQuantity)
     }
   }
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white rounded-2xl shadow-lg p-12">
-              <ShoppingBag className="mx-auto h-24 w-24 text-gray-300 mb-6" />
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-              <p className="text-gray-600 mb-8">
-                Looks like you haven't added any items to your cart yet. Start shopping to fill it up!
-              </p>
-              <div className="space-y-4">
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <Link href="/store" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Continue Shopping
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+          </div>
+
+          <div className="flex items-center justify-center h-96">
+            <Card className="w-full max-w-md text-center">
+              <CardContent className="pt-6">
+                <ShoppingCart className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+                <p className="text-gray-600 mb-6">Looks like you haven'"'"'t added anything to your cart yet.</p>
                 <Link href="/store">
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    Continue Shopping
-                  </Button>
+                  <Button className="w-full">Start Shopping</Button>
                 </Link>
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <Link href="/create-card">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                      Create a Card
-                    </Button>
-                  </Link>
-                  <Link href="/games">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                      Play Games
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
     )
   }
 
-  const totalPrice = getTotalPrice ? getTotalPrice() : 0
-  const itemCount = getCartItemCount ? getCartItemCount() : items.length
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/store">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Store
-            </Button>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <Link href="/store" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Continue Shopping
           </Link>
-          <div className="flex items-center">
-            <ShoppingCart className="h-8 w-8 text-blue-600 mr-3" />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-              <p className="text-gray-600">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'} in your cart
-              </p>
-            </div>
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+            <Badge variant="secondary" className="text-lg px-3 py-1">
+              {items.length} {items.length === 1 ? '"'"'item'"'"' : '"'"'items'"'"'}
+            </Badge>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-xl">Cart Items</CardTitle>
-                {items.length > 0 && clearCart && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={clearCart}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Clear Cart
-                  </Button>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {items.map((item: any, index: number) => (
-                  <div key={item.productId + '-' + (item.variantId || index)}>
-                    {index > 0 && <Separator />}
-                    <div className="flex gap-4 py-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-                          {item.image ? (
-                            <Image
-                              src={item.image}
-                              alt={item.title || 'Product'}
-                              width={96}
-                              height={96}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <ShoppingBag className="h-8 w-8 text-gray-300" />
+          {/* Cart Items */}
+          <div className="lg:col-span-2 space-y-4">
+            {items.map((item) => (
+              <Card key={`${item.productId}-${item.variantId}`} className="overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    {/* Product Image */}
+                    <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.title || "Product"}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full bg-gray-200 text-gray-400">
+                          <ShoppingCart className="h-8 w-8" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2">
+                          <h3 className="text-lg font-semibold text-gray-900 truncate">
+                            {item.title || `Product ${item.productId}`}
+                          </h3>
+                          
+                          {/* Product Options */}
+                          <div className="space-y-1">
+                            {Object.entries(item.options || {}).map(([key, value]) => (
+                              <div key={key} className="flex items-center space-x-2">
+                                <span className="text-sm text-gray-500 capitalize">{key}:</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {value}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Product Description */}
+                          {item.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {item.description}
+                            </p>
                           )}
                         </div>
-                      </div>
 
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {item.title || 'Product'}
-                        </h3>
-                        
-                        {item.description && (
-                          <p className="text-sm text-gray-600 mb-2">{item.description}</p>
-                        )}
-
-                        <div className="flex gap-2 mb-2">
-                          {item.color && (
-                            <Badge variant="outline" className="text-xs">
-                              Color: {item.color}
-                            </Badge>
-                          )}
-                          {item.size && (
-                            <Badge variant="secondary" className="text-xs">
-                              Size: {item.size}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end justify-between">
+                        {/* Price */}
                         <div className="text-right">
                           <div className="text-lg font-bold text-gray-900">
-                            {formatPrice(item.price * item.quantity)}
+                            ${(item.price * item.quantity).toFixed(2)}
                           </div>
-                          <p className="text-sm text-gray-500">
-                            {formatPrice(item.price)} each
-                          </p>
+                          {item.quantity > 1 && (
+                            <div className="text-sm text-gray-500">
+                              ${item.price.toFixed(2)} each
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Quantity Controls and Actions */}
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-3">
+                          {/* Quantity Selector */}
+                          <div className="flex items-center border border-gray-300 rounded-lg">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-l-lg"
+                              onClick={() => handleQuantityChange(item.productId, item.variantId, item.quantity - 1)}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <Input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const qty = parseInt(e.target.value, 10)
+                                if (qty >= 0) handleQuantityChange(item.productId, item.variantId, qty)
+                              }}
+                              className="w-16 h-8 text-center border-0 text-sm font-semibold"
+                              min="0"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-r-lg"
+                              onClick={() => handleQuantityChange(item.productId, item.variantId, item.quantity + 1)}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center space-x-2 mt-2">
+                        {/* Actions */}
+                        <div className="flex items-center space-x-2">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => handleUpdateQuantity(
-                              item.productId || item.id, 
-                              item.variantId, 
-                              item.quantity - 1
-                            )}
-                            disabled={item.quantity <= 1}
-                            className="h-8 w-8 p-0"
+                            className="text-gray-500 hover:text-red-600"
+                            onClick={() => removeFromCart(item.productId, item.variantId)}
                           >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="text-lg font-medium px-3 py-1 bg-gray-50 rounded-md min-w-[3rem] text-center">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(
-                              item.productId || item.id, 
-                              item.variantId, 
-                              item.quantity + 1
-                            )}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Plus className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Remove
                           </Button>
                         </div>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeFromCart && removeFromCart(item.productId || item.id, item.variantId)}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium mt-1"
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Remove
-                        </Button>
                       </div>
                     </div>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Clear Cart Button */}
+            <div className="pt-4">
+              <Button
+                variant="outline"
+                onClick={clearCart}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Clear Cart
+              </Button>
+            </div>
           </div>
 
-          <div className="lg:col-span-1">
-            <Card className="shadow-lg sticky top-4">
+          {/* Order Summary */}
+          <div className="space-y-6">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Order Summary</CardTitle>
+                <CardTitle>Order Summary</CardTitle>
+                <CardDescription>Review your order details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})</span>
-                    <span className="font-medium">{formatPrice(totalPrice)}</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal ({items.length} {items.length === 1 ? '"'"'item'"'"' : '"'"'items'"'"'})</span>
+                    <span>${subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-sm">
                     <span>Shipping</span>
-                    <span className="text-green-600 font-medium">FREE</span>
+                    <span className="flex items-center space-x-2">
+                      {shipping === 0 ? (
+                        <>
+                          <span className="line-through text-gray-400">$9.99</span>
+                          <span className="text-green-600 font-medium">FREE</span>
+                        </>
+                      ) : (
+                        <span>${shipping.toFixed(2)}</span>
+                      )}
+                    </span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
+                  {shipping > 0 && (
+                    <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                      Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
                     <span>Tax</span>
-                    <span>Calculated at checkout</span>
+                    <span>${tax.toFixed(2)}</span>
                   </div>
                   <Separator />
-                  <div className="flex justify-between text-xl font-bold text-gray-900">
+                  <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-green-600">{formatPrice(totalPrice)}</span>
+                    <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
-
-                <div className="space-y-3 pt-4">
-                  <Link href="/checkout">
-                    <Button className="w-full" size="lg">
-                      Proceed to Checkout
-                    </Button>
-                  </Link>
-                  <Link href="/store">
-                    <Button variant="outline" className="w-full">
-                      Continue Shopping
-                    </Button>
-                  </Link>
-                </div>
-
-                <div className="text-xs text-gray-500 pt-4 space-y-1">
-                  <p> Free shipping on orders over $50</p>
-                  <p> Secure checkout with SSL encryption</p>
-                  <p> 30-day return policy</p>
-                </div>
               </CardContent>
+              <CardFooter className="space-y-4">
+                <Link href="/store/checkout" className="w-full">
+                  <Button className="w-full h-12 text-lg font-semibold">
+                    Proceed to Checkout
+                  </Button>
+                </Link>
+                <div className="text-xs text-gray-500 text-center">
+                  Secure checkout powered by SSL encryption
+                </div>
+              </CardFooter>
             </Card>
 
-            <Card className="mt-6 bg-gray-50">
-              <CardContent className="p-4 text-center">
-                <div className="text-sm text-gray-600 font-medium">
-                   Secure Shopping Experience
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  SSL encrypted  Safe payments  Protected data
+            {/* Trust Badges */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">4.9/5 from 2,847 reviews</span>
+                  </div>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Free shipping on orders over $50</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>30-day money-back guarantee</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Secure payment processing</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
