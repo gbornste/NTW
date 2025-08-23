@@ -470,8 +470,8 @@ export function NewsFeed() {
       <div className="flex flex-col space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Newspaper className="h-6 w-6 text-red-600" />
-            <h2 className="text-2xl font-bold">Latest Headlines</h2>
+            <Newspaper className="h-5 w-5 text-red-600" />
+            <h2 className="text-base font-semibold">Latest Headlines</h2>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center text-sm text-muted-foreground">
@@ -587,7 +587,7 @@ export function NewsFeed() {
                         </Badge>
                         <span className="text-xs text-muted-foreground">{formatDate(item.pubDate)}</span>
                       </div>
-                      <CardTitle className="text-lg">{item.title}</CardTitle>
+                      <CardTitle className="text-sm font-medium leading-tight">{item.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="pb-2">
                       <div className="flex flex-col md:flex-row gap-4">

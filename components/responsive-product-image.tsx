@@ -28,7 +28,13 @@ export function ResponsiveProductImage({
   const [loaded, setLoaded] = useState(false)
 
   // Use a placeholder if the image fails to load
-  const imageSrc = error ? "/placeholder.svg?height=400&width=400" : src
+  let imageSrc = error ? "/placeholder.svg?height=400&width=400" : src
+  // Remove or replace '&fit=crop' in the image URL to prevent cropping
+  if (typeof imageSrc === 'string') {
+    imageSrc = imageSrc.replace(/([&?])fit=crop(&|$)/, (match, p1, p2) => (p2 === '&' ? p1 : ''));
+    // Optionally, you could use fit=contain instead:
+    // imageSrc = imageSrc.replace('fit=crop', 'fit=contain');
+  }
 
   if (fill) {
     return (

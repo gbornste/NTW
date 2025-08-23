@@ -13,70 +13,18 @@ import { Send, User, CheckCircle, AlertCircle, Loader2, MessageSquare, LogIn, Ma
 import { cardStorageService } from "@/lib/card-storage-service"
 import { cardSendingService, type CardSendingData } from "@/lib/card-sending-service"
 import Link from "next/link"
+import { useAuth } from "@/contexts/auth-context"
 
-interface CardData {
-  templateName: string
-  templateImage: string
-  message: string
-  recipientName: string
-  personalMessage: string
-  optionalNote: string
-  cardType: string
-  fontStyle: string
-  createdAt?: string
-}
-
+// Define CardSendingInterfaceProps if not already defined
 interface CardSendingInterfaceProps {
-  cardData: CardData
-  onSendComplete?: (result: any) => void
+  cardData: any
+  onSendComplete?: () => void
   onCancel?: () => void
 }
 
-// Simple auth hook for this component
-function useSimpleAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // Check authentication status
-    const checkAuth = () => {
-      try {
-        const authStatus = localStorage.getItem("isAuthenticated")
-        const userEmail = localStorage.getItem("userEmail")
-        const isDemoUser = localStorage.getItem("isDemoUser")
-
-        if (authStatus === "true" && userEmail) {
-          setIsAuthenticated(true)
-          setUser({
-            email: userEmail,
-            name: userEmail.split("@")[0],
-            isDemo: isDemoUser === "true",
-          })
-        }
-      } catch (error) {
-        console.error("Error checking auth:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    checkAuth()
-
-    // Listen for auth changes
-    const handleStorageChange = () => {
-      checkAuth()
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-    return () => window.removeEventListener("storage", handleStorageChange)
-  }, [])
-
-  return { isAuthenticated, user, isLoading }
-}
-
 export function CardSendingInterface({ cardData, onSendComplete, onCancel }: CardSendingInterfaceProps) {
-  const { isAuthenticated, user, isLoading } = useSimpleAuth()
+  const { user, isAuthenticated } = useAuth()
+  const isLoading = false // Context is ready
   const router = useRouter()
 
   const [recipientEmail, setRecipientEmail] = useState("")
@@ -169,7 +117,7 @@ export function CardSendingInterface({ cardData, onSendComplete, onCancel }: Car
       const sendingData: CardSendingData = cardSendingService.prepareCardForSending(
         cardData,
         { email: recipientEmail, name: recipientName },
-        { name: senderName, email: user.email },
+        { name: senderName, email: user?.email ?? "" },
         {
           subject: emailSubject,
           personalMessage: personalMessage,
@@ -180,7 +128,7 @@ export function CardSendingInterface({ cardData, onSendComplete, onCancel }: Car
       console.log("📤 Sending card with data:", sendingData)
 
       // Send the card
-      const result = await cardSendingService.sendCard(sendingData, user.isDemo)
+      const result = await cardSendingService.sendCard(sendingData, user?.isDemo ?? false)
 
       console.log("📬 Card sending result:", result)
 
@@ -190,7 +138,7 @@ export function CardSendingInterface({ cardData, onSendComplete, onCancel }: Car
 
         setSendResult(result)
         if (onSendComplete) {
-          onSendComplete(result)
+          onSendComplete()
         }
       } else {
         throw new Error(result.error || "Failed to send card")
@@ -220,6 +168,7 @@ export function CardSendingInterface({ cardData, onSendComplete, onCancel }: Car
     isAuthenticated,
     router,
   ])
+      // No need to throw if user is not defined; UI already blocks unauthenticated users
 
   // If still checking authentication
   if (isLoading) {
@@ -238,14 +187,14 @@ export function CardSendingInterface({ cardData, onSendComplete, onCancel }: Car
     return (
       <Card className="max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Authentication Required</CardTitle>
-          <CardDescription>You need to be logged in to send cards</CardDescription>
+          <CardTitle>Membership Required</CardTitle>
+          <CardDescription>You must sign up as a member to send cards.</CardDescription>
         </CardHeader>
         <CardContent>
           <Alert className="mb-4 bg-amber-50 border-amber-200">
             <AlertCircle className="h-4 w-4 text-amber-600" />
             <AlertDescription className="text-amber-800">
-              Your card has been saved. Please log in to send it.
+              Your card has been saved. Please log in or sign up to send it.
             </AlertDescription>
           </Alert>
 
@@ -267,9 +216,14 @@ export function CardSendingInterface({ cardData, onSendComplete, onCancel }: Car
         </CardContent>
         <CardFooter className="flex gap-4">
           <Button asChild className="flex-1">
-            <Link href={`/login?redirect=${encodeURIComponent(window.location.pathname)}`}>
+            <Link href={`/signup`}>
               <LogIn className="mr-2 h-4 w-4" />
-              Log In to Send
+              Sign Up to Send
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="flex-1">
+            <Link href={`/login?redirect=${encodeURIComponent(window.location.pathname)}`}>
+              Log In
             </Link>
           </Button>
           {onCancel && (

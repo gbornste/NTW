@@ -29,13 +29,7 @@ export default function SimpleDebugPage() {
               </div>
             </div>
 
-            <div>
-              <h3 className="font-medium mb-2">Demo Credentials</h3>
-              <div className="space-y-1">
-                <div>Email: demo@notrumpnway.com</div>
-                <div>Password: demo123</div>
-              </div>
-            </div>
+            {/* Demo credentials removed. Only real user login is supported. */}
 
             <div>
               <h3 className="font-medium mb-2">Test Links</h3>

@@ -3,7 +3,7 @@ import { printifyService } from "@/lib/printify-service"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     if (!id) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 })

@@ -17,77 +17,83 @@ import { UserPlus, Eye, EyeOff, ShoppingBag } from "lucide-react"
 import Image from "next/image"
 import { Separator } from "@/components/ui/separator"
 
-// List of US states for the dropdown
+// List of US states as abbreviations and names
 const US_STATES = [
-  "Alabama",
-  "Alaska",
-  "Arizona",
-  "Arkansas",
-  "California",
-  "Colorado",
-  "Connecticut",
-  "Delaware",
-  "Florida",
-  "Georgia",
-  "Hawaii",
-  "Idaho",
-  "Illinois",
-  "Indiana",
-  "Iowa",
-  "Kansas",
-  "Kentucky",
-  "Louisiana",
-  "Maine",
-  "Maryland",
-  "Massachusetts",
-  "Michigan",
-  "Minnesota",
-  "Mississippi",
-  "Missouri",
-  "Montana",
-  "Nebraska",
-  "Nevada",
-  "New Hampshire",
-  "New Jersey",
-  "New Mexico",
-  "New York",
-  "North Carolina",
-  "North Dakota",
-  "Ohio",
-  "Oklahoma",
-  "Oregon",
-  "Pennsylvania",
-  "Rhode Island",
-  "South Carolina",
-  "South Dakota",
-  "Tennessee",
-  "Texas",
-  "Utah",
-  "Vermont",
-  "Virginia",
-  "Washington",
-  "West Virginia",
-  "Wisconsin",
-  "Wyoming",
+  { abbr: "AL", name: "Alabama" },
+  { abbr: "AK", name: "Alaska" },
+  { abbr: "AZ", name: "Arizona" },
+  { abbr: "AR", name: "Arkansas" },
+  { abbr: "CA", name: "California" },
+  { abbr: "CO", name: "Colorado" },
+  { abbr: "CT", name: "Connecticut" },
+  { abbr: "DE", name: "Delaware" },
+  { abbr: "FL", name: "Florida" },
+  { abbr: "GA", name: "Georgia" },
+  { abbr: "HI", name: "Hawaii" },
+  { abbr: "ID", name: "Idaho" },
+  { abbr: "IL", name: "Illinois" },
+  { abbr: "IN", name: "Indiana" },
+  { abbr: "IA", name: "Iowa" },
+  { abbr: "KS", name: "Kansas" },
+  { abbr: "KY", name: "Kentucky" },
+  { abbr: "LA", name: "Louisiana" },
+  { abbr: "ME", name: "Maine" },
+  { abbr: "MD", name: "Maryland" },
+  { abbr: "MA", name: "Massachusetts" },
+  { abbr: "MI", name: "Michigan" },
+  { abbr: "MN", name: "Minnesota" },
+  { abbr: "MS", name: "Mississippi" },
+  { abbr: "MO", name: "Missouri" },
+  { abbr: "MT", name: "Montana" },
+  { abbr: "NE", name: "Nebraska" },
+  { abbr: "NV", name: "Nevada" },
+  { abbr: "NH", name: "New Hampshire" },
+  { abbr: "NJ", name: "New Jersey" },
+  { abbr: "NM", name: "New Mexico" },
+  { abbr: "NY", name: "New York" },
+  { abbr: "NC", name: "North Carolina" },
+  { abbr: "ND", name: "North Dakota" },
+  { abbr: "OH", name: "Ohio" },
+  { abbr: "OK", name: "Oklahoma" },
+  { abbr: "OR", name: "Oregon" },
+  { abbr: "PA", name: "Pennsylvania" },
+  { abbr: "RI", name: "Rhode Island" },
+  { abbr: "SC", name: "South Carolina" },
+  { abbr: "SD", name: "South Dakota" },
+  { abbr: "TN", name: "Tennessee" },
+  { abbr: "TX", name: "Texas" },
+  { abbr: "UT", name: "Utah" },
+  { abbr: "VT", name: "Vermont" },
+  { abbr: "VA", name: "Virginia" },
+  { abbr: "WA", name: "Washington" },
+  { abbr: "WV", name: "West Virginia" },
+  { abbr: "WI", name: "Wisconsin" },
+  { abbr: "WY", name: "Wyoming" },
 ]
 
-// Simple user creation function (demo implementation)
+// Real user creation function using API route
 async function createUser(userData: any) {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  // Set default values for fields not in the form
+  const now = new Date();
+  const startDate = now.toISOString().slice(0, 19).replace('T', ' ');
+  const endDate = new Date(now.setFullYear(now.getFullYear() + 200)).toISOString().slice(0, 19).replace('T', ' ');
 
-  // Demo validation
-  if (!userData.email || !userData.password) {
-    throw new Error("Email and password are required")
+  const payload = {
+    ...userData,
+    UserStartDate: startDate,
+    UserEndDate: endDate,
+  };
+
+  const res = await fetch("/api/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const result = await res.json();
+  if (!result.success) {
+    throw new Error(result.error || "Failed to create user");
   }
-
-  if (userData.email === "existing@example.com") {
-    throw new Error("Email already in use. Please use a different email address.")
-  }
-
-  // Simulate successful user creation
-  console.log("Demo user created:", userData.email)
-  return { success: true, userId: `user_${Date.now()}` }
+  return result;
 }
 
 function SignupContent() {
@@ -99,6 +105,7 @@ function SignupContent() {
 
   // Form state
   const [formData, setFormData] = useState({
+    title: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -109,6 +116,11 @@ function SignupContent() {
     state: "",
     zipCode: "",
     birthday: "",
+    polParty: "",
+    secureQuestion: "",
+    secureAnswer: "",
+    userPhone: "",
+    sendMail: true,
   })
 
   // Form validation state
@@ -125,13 +137,21 @@ function SignupContent() {
     return requirements
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const { name, value } = target;
+    let newValue: string | boolean = value;
+    if (target instanceof HTMLInputElement && target.type === "checkbox") {
+      newValue = target.checked;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
 
     // Clear error when user types
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }))
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   }
 
@@ -201,26 +221,12 @@ function SignupContent() {
       const result = await createUser(formData)
 
       if (result.success) {
-        if (result.requiresVerification) {
-          toast({
-            title: "Account created successfully!",
-            description: "Please check your email to verify your account before logging in.",
-          })
-
-          // Redirect to verification page with email and demo code
-          const verifyUrl = `/verify-email?email=${encodeURIComponent(formData.email)}${
-            result.verificationCode ? `&code=${result.verificationCode}` : ""
-          }`
-          router.push(verifyUrl)
-        } else {
-          toast({
-            title: "Account created successfully!",
-            description: "Welcome to NoTrumpNWay! You can now log in.",
-          })
-
-          // Redirect to login page for demo accounts
-          router.push("/login?message=Account created successfully")
-        }
+        toast({
+          title: "Account created successfully!",
+          description: "Welcome to NoTrumpNWay! You can now log in.",
+        });
+        // Redirect to login page for demo accounts
+        router.push("/login?message=Account created successfully");
       }
     } catch (error) {
       toast({
@@ -313,39 +319,60 @@ function SignupContent() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-red-600">Required Information</h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-sm font-medium">
-                          First Name
-                        </Label>
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          placeholder="John"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          className={`h-12 ${errors.firstName ? "border-red-500 focus:border-red-500" : ""}`}
-                          required
-                        />
-                        {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-sm font-medium">
-                          Last Name
-                        </Label>
-                        <Input
-                          id="lastName"
-                          name="lastName"
-                          placeholder="Doe"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          className={`h-12 ${errors.lastName ? "border-red-500 focus:border-red-500" : ""}`}
-                          required
-                        />
-                        {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
-                      </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="title" className="text-sm font-medium">
+                        Title
+                      </Label>
+                      <select
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        className="h-12 w-full rounded-md border border-gray-300 focus:border-blue-500 px-3 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+                        required
+                      >
+                        <option value="">Select</option>
+                        <option value="Mr.">Mr.</option>
+                        <option value="Mrs.">Mrs.</option>
+                        <option value="Ms.">Ms.</option>
+                        <option value="Dr.">Dr.</option>
+                        <option value="Mx.">Mx.</option>
+                        <option value="Prof.">Prof.</option>
+                        <option value="Rev.">Rev.</option>
+                      </select>
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName" className="text-sm font-medium">
+                        First Name
+                      </Label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className={`h-12 ${errors.firstName ? "border-red-500 focus:border-red-500" : ""}`}
+                        required
+                      />
+                      {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName" className="text-sm font-medium">
+                        Last Name
+                      </Label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className={`h-12 ${errors.lastName ? "border-red-500 focus:border-red-500" : ""}`}
+                        required
+                      />
+                      {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
+                    </div>
+                  </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-sm font-medium">
@@ -481,8 +508,8 @@ function SignupContent() {
                           </SelectTrigger>
                           <SelectContent>
                             {US_STATES.map((state) => (
-                              <SelectItem key={state} value={state}>
-                                {state}
+                              <SelectItem key={state.abbr} value={state.abbr}>
+                                {state.name} ({state.abbr})
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -503,6 +530,86 @@ function SignupContent() {
                         />
                         {errors.zipCode && <p className="text-sm text-red-500 mt-1">{errors.zipCode}</p>}
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="polParty" className="text-sm font-medium">
+                        Political Party
+                      </Label>
+                      <select
+                        id="polParty"
+                        name="polParty"
+                        value={formData.polParty}
+                        onChange={handleInputChange}
+                        className="h-12 w-full rounded-md border border-gray-300 focus:border-blue-500 px-3 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+                      >
+                        <option value="">Select</option>
+                        <option value="Democrat">Democrat</option>
+                        <option value="Republican">Republican</option>
+                        <option value="Libertarian">Libertarian</option>
+                        <option value="Green">Green</option>
+                        <option value="Constitution">Constitution</option>
+                        <option value="Independent">Independent</option>
+                        <option value="Unaffiliated">Unaffiliated</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="userPhone" className="text-sm font-medium">
+                        Phone Number
+                      </Label>
+                      <Input
+                        id="userPhone"
+                        name="userPhone"
+                        placeholder="5551234567"
+                        value={formData.userPhone}
+                        onChange={handleInputChange}
+                        className="h-12"
+                        maxLength={10}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="secureQuestion" className="text-sm font-medium">
+                        Security Question
+                      </Label>
+                      <Input
+                        id="secureQuestion"
+                        name="secureQuestion"
+                        placeholder="What is your mother's maiden name?"
+                        value={formData.secureQuestion}
+                        onChange={handleInputChange}
+                        className="h-12"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="secureAnswer" className="text-sm font-medium">
+                        Security Answer
+                      </Label>
+                      <Input
+                        id="secureAnswer"
+                        name="secureAnswer"
+                        placeholder="Answer"
+                        value={formData.secureAnswer}
+                        onChange={handleInputChange}
+                        className="h-12"
+                      />
+                    </div>
+
+                    <div className="flex items-center space-x-2 pt-2">
+                      <input
+                        type="checkbox"
+                        id="sendMail"
+                        name="sendMail"
+                        checked={formData.sendMail}
+                        onChange={handleInputChange}
+                        className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <Label htmlFor="sendMail" className="text-sm font-medium">
+                        Receive email updates and newsletters
+                      </Label>
                     </div>
                   </div>
 
@@ -533,16 +640,7 @@ function SignupContent() {
                   </Button>
                 </form>
 
-                <Separator className="my-6" />
 
-                {/* Demo Notice */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-5">
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 text-center">Demo Mode</h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
-                    This is a demonstration. Account creation is simulated and no real data is stored. After "creating"
-                    an account, you can use the demo login credentials on the login page.
-                  </p>
-                </div>
               </CardContent>
 
               <CardFooter className="flex flex-col space-y-4 pt-6">

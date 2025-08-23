@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -29,20 +30,31 @@ export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
-
+  const { login, user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
+  const [formData, setFormData] = useState({ email: "", password: "" })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loginError, setLoginError] = useState<string | null>(null)
-  const [hasPendingCard, setHasPendingCard] = useState(false)
-
+  const [hasPendingCard, setHasPendingCard] = useState(false) // Track if there is a pending card
   // Get redirect URL from query params
   const redirectUrl = searchParams?.get("redirect") || "/create-card"
-
+  // Block sending cards if not authenticated
+  useEffect(() => {
+    if (hasPendingCard && (!user || !user.id)) {
+      // If not authenticated, show a toast and block card sending
+      toast({
+        title: "Login required",
+        description: "You must be logged in to send a card.",
+        variant: "destructive",
+      })
+      // Optionally, clear pending card from localStorage
+      if (cardStorageService) {
+        cardStorageService.clearCard()
+        setHasPendingCard(false)
+      }
+    }
+  }, [hasPendingCard, user, toast])
   // Check for pending card safely
   useEffect(() => {
     if (typeof window !== "undefined" && cardStorageService) {
@@ -54,135 +66,71 @@ export default function LoginPage() {
       }
     }
   }, [])
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }))
     }
-
-    // Clear login error when user types
     if (loginError) {
       setLoginError(null)
     }
   }
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
-
     if (!formData.email.trim()) {
       newErrors.email = "Email address is required"
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address"
     }
-
     if (!formData.password) {
       newErrors.password = "Password is required"
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm() || isLoading) {
       return
     }
-
     setIsLoading(true)
-
     try {
-      // Simulate login process
-      const loginResponse = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      })
-
-      const loginData = await loginResponse.json()
-
-      if (loginResponse.ok && loginData.success) {
-        // Store auth state
-        localStorage.setItem("isAuthenticated", "true")
-        localStorage.setItem("userEmail", formData.email)
-
-        // Check if there's a pending card and redirect appropriately
-        if (cardStorageService && cardStorageService.hasPendingCard()) {
+      await login(formData.email, formData.password)
+      // Show toast with user's name from context
+      if (typeof window !== "undefined" && user && user.name) {
+        toast({
+          title: `Hello, ${user.name}!`,
+          description: "You have successfully logged in.",
+          variant: "default",
+        })
+      }
+      // Only allow card sending if authenticated
+      if (cardStorageService && cardStorageService.hasPendingCard()) {
+        if (user && user.id) {
           const pendingCard = cardStorageService.getCard()
           console.log("✅ Pending card found after login:", pendingCard)
-
-          toast({
-            title: "Login successful!",
-            description: "You can now send your card.",
-          })
+          router.push("/create-card")
+          return
         } else {
           toast({
-            title: "Login successful!",
-            description: "Welcome back to NoTrumpNWay.",
+            title: "Login required",
+            description: "You must be logged in to send a card.",
+            variant: "destructive",
           })
+          cardStorageService.clearCard()
+          setHasPendingCard(false)
         }
-
-        // Redirect to the original page
-        router.push(redirectUrl)
-      } else {
-        setLoginError(loginData.error || "Invalid email or password")
       }
-    } catch (error) {
-      console.error("Login error:", error)
-      setLoginError("An unexpected error occurred. Please try again.")
+      // Default redirect to profile
+      router.push("/profile")
+    } catch (error: any) {
+      setLoginError(error.message || "Login failed. Please try again.")
     } finally {
       setIsLoading(false)
     }
   }
-
-  const handleDemoLogin = async () => {
-    setIsLoading(true)
-
-    try {
-      // Demo login with predefined credentials
-      const demoCredentials = {
-        email: "demo@notrumpnway.com",
-        password: "demo123",
-      }
-
-      // Store auth state for demo
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem("userEmail", demoCredentials.email)
-      localStorage.setItem("isDemoUser", "true")
-
-      // Check if there's a pending card
-      if (cardStorageService && cardStorageService.hasPendingCard()) {
-        const pendingCard = cardStorageService.getCard()
-        console.log("✅ Pending card found after demo login:", pendingCard)
-
-        toast({
-          title: "Demo login successful!",
-          description: "You can now send your card.",
-        })
-      } else {
-        toast({
-          title: "Demo login successful!",
-          description: "Welcome to the NoTrumpNWay demo account.",
-        })
-      }
-
-      // Redirect to the original page
-      router.push(redirectUrl)
-    } catch (error) {
-      console.error("Demo login error:", error)
-      setLoginError("Failed to log in with demo account. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
+  // Demo login removed. Only real user login is supported.
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container flex items-center justify-center py-12 px-4">
@@ -206,7 +154,6 @@ export default function LoginPage() {
               Sign in to access exclusive political merchandise, create custom greeting cards, and explore our
               collection of political content.
             </p>
-
             {hasPendingCard && (
               <Alert className="mb-6 bg-amber-50 border-amber-200">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
@@ -215,13 +162,11 @@ export default function LoginPage() {
                 </AlertDescription>
               </Alert>
             )}
-
             <div className="space-y-6 w-full max-w-sm">
               <div className="flex items-center space-x-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-700">
                 <ShoppingBag className="h-6 w-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300">Access exclusive political merchandise</span>
               </div>
-
               <div className="flex items-center space-x-4 p-4 bg-green-50 dark:bg-green-900/30 rounded-xl border border-green-200 dark:border-green-700">
                 <svg
                   className="h-6 w-6 text-green-600 dark:text-green-400 flex-shrink-0"
@@ -233,14 +178,12 @@ export default function LoginPage() {
                 </svg>
                 <span className="text-gray-700 dark:text-gray-300">Create custom greeting cards</span>
               </div>
-
               <div className="flex items-center space-x-4 p-4 bg-purple-50 dark:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
                 <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300">Secure login with verification</span>
               </div>
             </div>
           </div>
-
           {/* Right Side - Login Form */}
           <div className="flex items-center justify-center">
             <Card className="w-full max-w-md shadow-2xl border-0">
@@ -257,7 +200,6 @@ export default function LoginPage() {
                 </div>
                 <CardTitle className="text-3xl font-bold">Sign In</CardTitle>
                 <CardDescription className="text-base">Enter your credentials to access your account</CardDescription>
-
                 {hasPendingCard && (
                   <Alert className="mt-4 bg-amber-50 border-amber-200">
                     <AlertCircle className="h-4 w-4 text-amber-600" />
@@ -267,7 +209,6 @@ export default function LoginPage() {
                   </Alert>
                 )}
               </CardHeader>
-
               <CardContent className="space-y-6">
                 {loginError && (
                   <Alert variant="destructive">
@@ -275,7 +216,6 @@ export default function LoginPage() {
                     <AlertDescription>{loginError}</AlertDescription>
                   </Alert>
                 )}
-
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium">
@@ -293,14 +233,12 @@ export default function LoginPage() {
                     />
                     {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="password" className="text-sm font-medium">
                       Password
                     </Label>
                     <div className="relative">
                       <Input
-                        id="password"
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
@@ -317,7 +255,6 @@ export default function LoginPage() {
                       </button>
                     </div>
                     {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
-
                     <div className="text-right">
                       <Link
                         href="/password-reset/request"
@@ -327,7 +264,6 @@ export default function LoginPage() {
                       </Link>
                     </div>
                   </div>
-
                   <Button type="submit" className="w-full h-12 text-base font-medium" disabled={isLoading}>
                     {isLoading ? (
                       <span className="flex items-center">
@@ -354,52 +290,9 @@ export default function LoginPage() {
                     )}
                   </Button>
                 </form>
-
                 <Separator className="my-6" />
-
-                {/* Demo Login Button */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-5">
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 text-center">Quick Demo Access</h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mb-4 text-center">
-                    Try out all features instantly with our demo account
-                  </p>
-
-                  <Button
-                    onClick={handleDemoLogin}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        Loading Demo...
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        <LogIn className="mr-2 h-5 w-5" />
-                        Login as Demo User
-                      </span>
-                    )}
-                  </Button>
-
-                  <div className="mt-3 text-xs text-center text-blue-600 dark:text-blue-400">
-                    Email: demo@notrumpnway.com | Password: demo123
-                  </div>
-                </div>
+                {/* Demo login removed. Only real user login is supported. */}
               </CardContent>
-
               <CardFooter className="flex flex-col space-y-4 pt-6">
                 <div className="text-center text-sm text-gray-600 dark:text-gray-400">
                   Don't have an account?{" "}
@@ -410,7 +303,6 @@ export default function LoginPage() {
                     Sign up here
                   </Link>
                 </div>
-
                 <div className="text-center">
                   <Link
                     href="/"

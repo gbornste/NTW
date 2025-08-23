@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { loginUser } from "@/app/actions/user-actions"
 
 export async function POST(request: NextRequest) {
@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
     const result = await loginUser(email, password)
     console.log("🔐 API: Login result:", {
       success: result.success,
-      requiresVerification: result.requiresVerification,
       hasUser: !!result.user,
       error: result.error,
     })
@@ -28,20 +27,28 @@ export async function POST(request: NextRequest) {
     if (result.success && result.user) {
       console.log(`✅ API: Login successful for: ${result.user.email}`)
 
+      // Normalize user object for frontend
+      const userForFrontend = {
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name || `${result.user.firstName || ''} ${result.user.lastName || ''}`.trim(),
+        isVerified: result.user.isVerified,
+        // add any other fields you want to expose
+      }
+
       // Set session cookie
       const response = NextResponse.json({
-        user: result.user,
+        user: userForFrontend,
         message: "Login successful",
         timestamp: new Date().toISOString(),
       })
 
       // Set a simple session cookie
       const sessionData = {
-        email: result.user.email,
-        userId: result.user.id,
-        isVerified: result.user.isVerified,
-        firstName: result.user.firstName,
-        lastName: result.user.lastName,
+        email: userForFrontend.email,
+        userId: userForFrontend.id,
+        isVerified: userForFrontend.isVerified,
+        name: userForFrontend.name,
         loginTime: new Date().toISOString(),
       }
 
@@ -52,7 +59,7 @@ export async function POST(request: NextRequest) {
         maxAge: 60 * 60 * 24, // 24 hours
       })
 
-      console.log("✅ API: Session cookie set for:", result.user.email)
+      console.log("✅ API: Session cookie set for:", userForFrontend.email)
 
       return response
     } else {
@@ -61,8 +68,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: result.error || "Login failed",
-          requiresVerification: result.requiresVerification || false,
-          email: result.email,
           timestamp: new Date().toISOString(),
           debugInfo:
             process.env.NODE_ENV === "development"

@@ -28,17 +28,7 @@ export function CardAuthWrapper({ children, action = "send" }: CardAuthWrapperPr
         setIsLoading(true)
         console.log("🔍 Checking authentication status...")
 
-        // CRITICAL FIX: First check localStorage for demo accounts
-        const localStorageAuth = localStorage.getItem("isAuthenticated") === "true"
-        const localStorageEmail = localStorage.getItem("userEmail")
-
-        if (localStorageAuth && localStorageEmail) {
-          console.log("✅ Found authentication in localStorage:", localStorageEmail)
-          setIsAuthenticated(true)
-          setUserEmail(localStorageEmail)
-          setIsLoading(false)
-          return
-        }
+        // Only check server session for authentication. Demo/localStorage logic removed.
 
         // If not in localStorage, try to fetch from server
         try {
@@ -183,11 +173,7 @@ export function CardAuthWrapper({ children, action = "send" }: CardAuthWrapperPr
             </p>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 text-blue-800 text-sm">
-            <p className="font-medium mb-2">Demo Account Credentials:</p>
-            <p>Email: demo@notrumpnway.com</p>
-            <p>Password: demo123</p>
-          </div>
+          {/* Demo account credentials removed. Only real user login is supported. */}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <div className="flex justify-between w-full">

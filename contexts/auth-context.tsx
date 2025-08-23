@@ -37,9 +37,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+
   useEffect(() => {
     // Check for existing session on mount
     checkAuthStatus()
+
+    // Listen for localStorage changes (e.g., login in another tab)
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "auth_user" || event.key === "auth_token") {
+        checkAuthStatus()
+      }
+    }
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
   }, [])
 
   const checkAuthStatus = async () => {
@@ -68,25 +78,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // For demo purposes, accept any email/password combination
-      const userData: User = {
-        id: `user_${Date.now()}`,
-        email,
-        name: email.split("@")[0],
-        isDemo: false,
+      const res = await fetch("/api/simple-auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData?.error || "Login failed. Please try again.")
       }
-
-      // Store session
-      localStorage.setItem("auth_user", JSON.stringify(userData))
-      localStorage.setItem("auth_token", `token_${Date.now()}`)
-
-      setUser(userData)
-    } catch (error) {
+      const data = await res.json()
+      // Normalize user object to always have 'id'
+      if (!data.user) throw new Error("No user returned from server.")
+      const normalizedUser = {
+        ...data.user,
+        id: data.user.id,
+      }
+      localStorage.setItem("auth_user", JSON.stringify(normalizedUser))
+      if (data.token) localStorage.setItem("auth_token", data.token)
+      setUser(normalizedUser)
+    } catch (error: any) {
       console.error("Login error:", error)
-      throw new Error("Login failed. Please try again.")
+      throw new Error(error.message || "Login failed. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -139,24 +152,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const userData: User = {
-        id: `user_${Date.now()}`,
-        email,
-        name,
-        isDemo: false,
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, firstName: name }),
+      })
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData?.error || "Signup failed. Please try again.")
       }
-
-      // Store session
-      localStorage.setItem("auth_user", JSON.stringify(userData))
-      localStorage.setItem("auth_token", `token_${Date.now()}`)
-
-      setUser(userData)
-    } catch (error) {
+      // Optionally, auto-login after signup:
+      await login(email, password)
+    } catch (error: any) {
       console.error("Signup error:", error)
-      throw new Error("Signup failed. Please try again.")
+      throw new Error(error.message || "Signup failed. Please try again.")
     } finally {
       setIsLoading(false)
     }

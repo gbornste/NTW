@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { getUserProfile, updateUserProfile, updateUserPassword } from "../actions/user-actions"
+import { useAuth } from "@/contexts/auth-context"
 import { ArrowLeft, Save, LogOut, User, ShoppingBag, Heart, Settings } from "lucide-react"
 
 // List of US states for the dropdown
@@ -71,6 +72,7 @@ const US_STATES = [
 
 export default function ProfilePage() {
   const router = useRouter()
+  const { user } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -117,12 +119,13 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // In a real app, this would fetch the user's profile from the server
-        const userData = await getUserProfile()
-
+        if (!user) {
+          router.push("/login")
+          return
+        }
+        const userData = await getUserProfile(user.id)
         // Format the birthday for the date input
         const formattedBirthday = userData.birthday ? new Date(userData.birthday).toISOString().split("T")[0] : ""
-
         setProfileData({
           ...userData,
           birthday: formattedBirthday,
@@ -133,16 +136,13 @@ export default function ProfilePage() {
           description: "Please try again later or contact support.",
           variant: "destructive",
         })
-
-        // Redirect to login if not authenticated
         router.push("/login")
       } finally {
         setIsLoading(false)
       }
     }
-
     fetchProfile()
-  }, [router, toast])
+  }, [router, toast, user])
 
   // Handle profile input changes
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -298,7 +298,8 @@ export default function ProfilePage() {
 
     try {
       // In a real app, this would call a server action to update the password
-      await updateUserPassword(passwordData)
+      // Pass user id and new password to updateUserPassword
+      await updateUserPassword(user?.id, passwordData.newPassword)
 
       toast({
         title: "Password changed successfully!",

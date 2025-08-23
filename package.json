@@ -6,10 +6,14 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "@auth/core": "latest",
+    "@auth/core": "^0.40.0",
+    "@babel/eslint-parser": "^7.28.0",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -38,7 +42,11 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
     "autoprefixer": "^10.4.20",
+    "bcryptjs": "^3.0.2",
     "canvas-confetti": "latest",
     "cheerio": "latest",
     "class-variance-authority": "^0.7.1",
@@ -46,16 +54,18 @@
     "cmdk": "1.0.4",
     "crypto": "latest",
     "date-fns": "latest",
+    "dotenv": "^17.2.0",
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-    "next": "15.2.4",
-    "next-auth": "latest",
+    "mysql2": "^3.14.2",
+    "next": "^14.2.31",
+    "next-auth": "^4.24.7",
     "next-themes": "latest",
     "nodemailer": "latest",
-    "react": "^19",
+    "react": "^18.3.1",
     "react-day-picker": "9.7.0",
-    "react-dom": "^19",
+    "react-dom": "^18.3.1",
     "react-error-boundary": "latest",
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
@@ -68,11 +78,35 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@swc/jest": "^0.2.39",
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.12",
     "@types/node": "^22",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
-  }
+  },
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbornste/NTW.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gbornste/NTW/issues"
+  },
+  "homepage": "https://github.com/gbornste/NTW#readme"
 }

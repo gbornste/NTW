@@ -1,52 +1,45 @@
-"use client"
+﻿"use client"
 
 import type React from "react"
-import { createContext, useContext, useReducer, useEffect, useState } from "react"
+import { createContext, useContext, useReducer, useEffect } from "react"
 
 export interface CartItem {
-  id: string
   productId: string
   variantId: string
-  name: string
-  price: number
   quantity: number
-  image: string
-  variant: string
-  variantTitle?: string
-  options?: Record<string, string>
-  customization?: {
-    giftWrap?: boolean
-    giftMessage?: string
-    specialInstructions?: string
-    rushDelivery?: boolean
-    expressShipping?: boolean
-  }
+  options: Record<string, string>
+  price: number
+  title?: string
+  image?: string
+  description?: string
+  dateAdded?: string
 }
 
 interface CartState {
   items: CartItem[]
-  total: number
   itemCount: number
+  totalPrice: number
   isLoading: boolean
 }
 
 type CartAction =
-  | { type: "ADD_ITEM"; payload: CartItem }
-  | { type: "REMOVE_ITEM"; payload: string }
-  | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
+  | { type: "ADD_TO_CART"; payload: CartItem }
+  | { type: "REMOVE_FROM_CART"; payload: { productId: string; variantId: string } }
+  | { type: "UPDATE_QUANTITY"; payload: { productId: string; variantId: string; quantity: number } }
   | { type: "CLEAR_CART" }
   | { type: "LOAD_CART"; payload: CartItem[] }
   | { type: "SET_LOADING"; payload: boolean }
 
 interface CartContextType {
   state: CartState
-  addItem: (item: CartItem) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
+  addToCart: (item: CartItem) => void
+  removeFromCart: (productId: string, variantId: string) => void
+  updateQuantity: (productId: string, variantId: string, quantity: number) => void
   clearCart: () => void
+  getCartItemCount: () => number
+  getTotalPrice: () => number
+  isInCart: (productId: string, variantId: string) => boolean
   isLoading: boolean
-  subtotal: number
-  itemCount: number
   items: CartItem[]
 }
 
@@ -57,44 +50,81 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "SET_LOADING":
       return { ...state, isLoading: action.payload }
 
-    case "ADD_ITEM": {
-      const existingItemIndex = state.items.findIndex((item) => item.id === action.payload.id)
-
-      if (existingItemIndex >= 0) {
-        // Update existing item quantity
-        const updatedItems = state.items.map((item, index) =>
-          index === existingItemIndex ? { ...item, quantity: item.quantity + action.payload.quantity } : item,
+    case "ADD_TO_CART": {
+      const existingIndex = state.items.findIndex(
+        (item) => item.productId === action.payload.productId && item.variantId === action.payload.variantId
+      )
+      
+      let newItems: CartItem[]
+      if (existingIndex >= 0) {
+        newItems = state.items.map((item, index) =>
+          index === existingIndex
+            ? { ...item, quantity: item.quantity + action.payload.quantity }
+            : item
         )
-        return calculateCartTotals({ ...state, items: updatedItems })
       } else {
-        // Add new item
-        return calculateCartTotals({ ...state, items: [...state.items, action.payload] })
+        newItems = [...state.items, { ...action.payload, dateAdded: new Date().toISOString() }]
+      }
+
+      const itemCount = newItems.reduce((total, item) => total + item.quantity, 0)
+      const totalPrice = newItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+
+      return {
+        ...state,
+        items: newItems,
+        itemCount,
+        totalPrice,
       }
     }
 
-    case "REMOVE_ITEM": {
-      const updatedItems = state.items.filter((item) => item.id !== action.payload)
-      return calculateCartTotals({ ...state, items: updatedItems })
+    case "REMOVE_FROM_CART": {
+      const newItems = state.items.filter(
+        (item) => !(item.productId === action.payload.productId && item.variantId === action.payload.variantId)
+      )
+      const itemCount = newItems.reduce((total, item) => total + item.quantity, 0)
+      const totalPrice = newItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+
+      return {
+        ...state,
+        items: newItems,
+        itemCount,
+        totalPrice,
+      }
     }
 
     case "UPDATE_QUANTITY": {
-      if (action.payload.quantity <= 0) {
-        const updatedItems = state.items.filter((item) => item.id !== action.payload.id)
-        return calculateCartTotals({ ...state, items: updatedItems })
-      } else {
-        const updatedItems = state.items.map((item) =>
-          item.id === action.payload.id ? { ...item, quantity: action.payload.quantity } : item,
-        )
-        return calculateCartTotals({ ...state, items: updatedItems })
+      const newItems = state.items.map((item) =>
+        item.productId === action.payload.productId && item.variantId === action.payload.variantId
+          ? { ...item, quantity: action.payload.quantity }
+          : item
+      ).filter(item => item.quantity > 0)
+
+      const itemCount = newItems.reduce((total, item) => total + item.quantity, 0)
+      const totalPrice = newItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+
+      return {
+        ...state,
+        items: newItems,
+        itemCount,
+        totalPrice,
       }
     }
 
     case "CLEAR_CART": {
-      return { items: [], total: 0, itemCount: 0, isLoading: false }
+      return { items: [], itemCount: 0, totalPrice: 0, isLoading: false }
     }
 
     case "LOAD_CART": {
-      return calculateCartTotals({ ...state, items: action.payload, isLoading: false })
+      const itemCount = action.payload.reduce((total, item) => total + item.quantity, 0)
+      const totalPrice = action.payload.reduce((total, item) => total + (item.price * item.quantity), 0)
+
+      return {
+        ...state,
+        items: action.payload,
+        itemCount,
+        totalPrice,
+        isLoading: false,
+      }
     }
 
     default:
@@ -102,126 +132,88 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   }
 }
 
-function calculateCartTotals(state: CartState): CartState {
-  const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0)
-  return { ...state, total, itemCount }
-}
-
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
-    total: 0,
     itemCount: 0,
+    totalPrice: 0,
     isLoading: true,
   })
 
-  // Check if we're on the client side
-  const [isClient, setIsClient] = useState(false)
-
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    if (!isClient) return
-
     const loadCart = async () => {
       try {
         dispatch({ type: "SET_LOADING", payload: true })
-
-        // Add a small delay to simulate loading (remove in production)
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
+        await new Promise((resolve) => setTimeout(resolve, 300))
         const savedCart = localStorage.getItem("notrumpnway-cart")
         if (savedCart) {
           const parsedCart = JSON.parse(savedCart)
           if (Array.isArray(parsedCart)) {
-            console.log(`🛒 Loaded ${parsedCart.length} items from localStorage`)
             dispatch({ type: "LOAD_CART", payload: parsedCart })
           } else {
-            console.log("🛒 Invalid cart data in localStorage, starting fresh")
             dispatch({ type: "LOAD_CART", payload: [] })
           }
         } else {
-          console.log("🛒 No saved cart found, starting fresh")
           dispatch({ type: "LOAD_CART", payload: [] })
         }
       } catch (error) {
-        console.error("Error loading cart from localStorage:", error)
+        console.error("Error loading cart:", error)
         dispatch({ type: "LOAD_CART", payload: [] })
       } finally {
         dispatch({ type: "SET_LOADING", payload: false })
       }
     }
-
     loadCart()
-  }, [isClient])
+  }, [])
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    if (!state.isLoading && isClient) {
+    if (!state.isLoading) {
       try {
         localStorage.setItem("notrumpnway-cart", JSON.stringify(state.items))
-        console.log(`💾 Saved ${state.items.length} items to localStorage`)
       } catch (error) {
-        console.error("Error saving cart to localStorage:", error)
+        console.error("Error saving cart:", error)
       }
     }
-  }, [state.items, state.isLoading, isClient])
+  }, [state.items, state.isLoading])
 
-  const addItem = (item: CartItem) => {
-    // Ensure all values are properly converted to strings and numbers
-    const sanitizedItem: CartItem = {
-      ...item,
-      id: String(item.id),
-      productId: String(item.productId),
-      variantId: String(item.variantId),
-      name: String(item.name),
-      variant: String(item.variant),
-      variantTitle: String(item.variantTitle || item.variant),
-      image: String(item.image),
-      price: Number(item.price),
-      quantity: Number(item.quantity),
-      options: item.options || {},
-      customization: item.customization || {},
-    }
-
-    console.log(`🛒 Adding item to cart:`, {
-      id: sanitizedItem.id,
-      name: sanitizedItem.name,
-      price: sanitizedItem.price,
-      quantity: sanitizedItem.quantity,
-      customization: sanitizedItem.customization,
-    })
-    dispatch({ type: "ADD_ITEM", payload: sanitizedItem })
+  const addToCart = (item: CartItem) => {
+    dispatch({ type: "ADD_TO_CART", payload: item })
   }
 
-  const removeItem = (id: string) => {
-    console.log(`🗑️ Removing item from cart: ${id}`)
-    dispatch({ type: "REMOVE_ITEM", payload: id })
+  const removeFromCart = (productId: string, variantId: string) => {
+    dispatch({ type: "REMOVE_FROM_CART", payload: { productId, variantId } })
   }
 
-  const updateQuantity = (id: string, quantity: number) => {
-    console.log(`🔄 Updating quantity for ${id}: ${quantity}`)
-    dispatch({ type: "UPDATE_QUANTITY", payload: { id, quantity } })
+  const updateQuantity = (productId: string, variantId: string, quantity: number) => {
+    dispatch({ type: "UPDATE_QUANTITY", payload: { productId, variantId, quantity } })
   }
 
   const clearCart = () => {
-    console.log(`🧹 Clearing cart`)
     dispatch({ type: "CLEAR_CART" })
+  }
+
+  const getCartItemCount = (): number => {
+    return state.itemCount
+  }
+
+  const getTotalPrice = (): number => {
+    return state.totalPrice
+  }
+
+  const isInCart = (productId: string, variantId: string): boolean => {
+    return state.items.some((item) => item.productId === productId && item.variantId === variantId)
   }
 
   const contextValue: CartContextType = {
     state,
-    addItem,
-    removeItem,
+    addToCart,
+    removeFromCart,
     updateQuantity,
     clearCart,
+    getCartItemCount,
+    getTotalPrice,
+    isInCart,
     isLoading: state.isLoading,
-    subtotal: state.total,
-    itemCount: state.itemCount,
     items: state.items,
   }
 

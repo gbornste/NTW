@@ -42,9 +42,26 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [theme, setTheme] = useState<"light" | "dark">("light")
-  const { itemCount } = useCart()
-  const { itemCount: favoritesCount } = useFavorites()
+  const { getCartItemCount } = useCart()
+  const { items: favorites } = useFavorites()
   const { isAuthenticated, user, logout } = useAuth()
+
+  const itemCount = getCartItemCount()
+  const favoritesCount = favorites.length
+
+  // Debug: log auth state to help diagnose login/logout issues
+  useEffect(() => {
+    console.log("[Navbar] isAuthenticated:", isAuthenticated, "user:", user)
+    // Extra: log localStorage and context
+    try {
+      const storedUser = localStorage.getItem("auth_user")
+      const storedToken = localStorage.getItem("auth_token")
+      console.log("[Navbar] localStorage auth_user:", storedUser)
+      console.log("[Navbar] localStorage auth_token:", storedToken)
+    } catch (e) {
+      console.warn("[Navbar] Could not access localStorage", e)
+    }
+  }, [isAuthenticated, user])
 
   useEffect(() => {
     setMounted(true)
@@ -224,6 +241,7 @@ export default function Navbar() {
             </Button>
           </Link>
 
+          {/* Always show the user icon dropdown, with content based on auth state */}
           {!isMobile && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -242,6 +260,10 @@ export default function Navbar() {
                       {user?.name || user?.email || "User"}
                       {user?.isDemo && " (Demo)"}
                     </div>
+                    {/* Smaller greeting shown under user info */}
+                    {user?.name && (
+                      <div className="px-2 pb-1 text-xs text-gray-500 dark:text-gray-400 font-normal">Hello, {user.name}!</div>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="flex items-center cursor-pointer">
