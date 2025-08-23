@@ -43,7 +43,7 @@ export default function CartPage() {
               <CardContent className="pt-6">
                 <ShoppingCart className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                 <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-                <p className="text-gray-600 mb-6">Looks like you haven'"'"'t added anything to your cart yet.</p>
+                <p className="text-gray-600 mb-6">Looks like you have not added anything to your cart yet.</p>
                 <Link href="/store">
                   <Button className="w-full">Start Shopping</Button>
                 </Link>
@@ -66,7 +66,7 @@ export default function CartPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
             <Badge variant="secondary" className="text-lg px-3 py-1">
-              {items.length} {items.length === 1 ? '"'"'item'"'"' : '"'"'items'"'"'}
+              {items.length} {items.length === 1 ? "item" : "items"}
             </Badge>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function CartPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span>Subtotal ({items.length} {items.length === 1 ? '"'"'item'"'"' : '"'"'items'"'"'})</span>
+                    <span>Subtotal ({items.length} {items.length === 1 ? "item" : "items"})</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
