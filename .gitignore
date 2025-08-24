@@ -25,3 +25,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Transient auto-generated reports
+ALL_ISSUES_RESOLVED_FINAL_REPORT.md
+COMPLETE_TESTING_SUCCESS_REPORT.md
+CRITICAL_EMERGENCY_FIX_SUCCESS.md
+CTO_EMERGENCY_DEPLOYMENT_SUCCESS.md
+EMERGENCY_UI_DESIGNER_SUCCESS_REPORT.md
+enhanced_product_page_code.txt
+app/store/product/[id]/page.enhanced.v1.tsx
