@@ -639,7 +639,7 @@ export default function ProductPage() {
             )}
 
             {/* Size Selection with Dropdown */}
-            {uniqueSizes.length > 0 && (
+            {true && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -660,7 +660,7 @@ export default function ProductPage() {
                     <SelectValue placeholder="Select your size" />
                   </SelectTrigger>
                   <SelectContent>
-                    {uniqueSizes.map((size) => (
+                    {['S', 'M', 'L', 'XL', '2XL', '3XL'].map((size) => (
                       <SelectItem key={size} value={size} className="text-lg py-3">
                         <div className="flex items-center justify-between w-full">
                           <span>{size}</span>
