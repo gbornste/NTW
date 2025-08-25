@@ -118,7 +118,7 @@ export default function ProductPage({ params }) {
         id: selectedVariant.id.toString(),
         productId: product.id,
         title: product.title,
-        price: selectedVariant.price / 100,
+        price: selectedVariant.price,
         image: imageUrl,
         variant: {
           color: selectedColor,
@@ -165,7 +165,7 @@ export default function ProductPage({ params }) {
     )
   }
 
-  const currentPrice = selectedVariant ? selectedVariant.price / 100 : 0
+  const currentPrice = selectedVariant ? selectedVariant.price : 0
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50'>

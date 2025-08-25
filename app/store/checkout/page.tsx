@@ -56,7 +56,7 @@ export default function CheckoutPage() {
   })
 
   const subtotal = getTotalPrice()
-  const shipping = 9.99
+  const shipping = subtotal >= 50 ? 0 : 9.99
   const tax = subtotal * 0.08
   const total = subtotal + shipping + tax
 
@@ -166,7 +166,7 @@ export default function CheckoutPage() {
                         <p className="text-sm text-gray-500">
                           Qty: {item.quantity}
                         </p>
-                        {Object.entries(item.options).map(([key, value]) => (
+                        {item.options && Object.entries(item.options).map(([key, value]) => (
                           <p key={key} className="text-xs text-gray-500">
                             {key}: {value}
                           </p>
