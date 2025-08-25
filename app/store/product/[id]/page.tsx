@@ -320,15 +320,16 @@ export default function ProductPage() {
     
     try {
       await addToCart({
-        id: product.id,
-        variantId: selectedVariant.id,
+        productId: product.id,
+        variantId: selectedVariant.id.toString(),
         title: product.title,
-        variant: selectedVariant.title,
         price: selectedVariant.price,
         image: availableImages[currentImageIndex]?.src || product.images?.[0]?.src || '',
         quantity,
-        color: selectedColor,
-        size: selectedSize
+        options: {
+          color: selectedColor,
+          size: selectedSize
+        }
       })
       
       setAddedToCart(true)
