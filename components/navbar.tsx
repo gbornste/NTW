@@ -24,6 +24,76 @@ export function Navbar() {
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-sm supports-[backdrop-filter]:bg-white/95 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/95 shadow-sm'>
       <div className='container flex h-16 items-center px-4'>
+        {/* Mobile Menu Button - Left Side */}
+        <div className='md:hidden mr-3'>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant='ghost' size='sm' className='h-9 w-9 p-0'>
+                <Menu className='h-4 w-4' />
+                <span className='sr-only'>Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='left' className='w-80'>
+              <div className='flex items-center space-x-3 mb-8'>
+                <Image
+                  src='/images/logo.png'
+                  alt='NoTrumpNWay Logo'
+                  width={32}
+                  height={32}
+                  className='rounded-lg'
+                />
+                <div>
+                  <span className='text-lg font-bold'>NoTrumpNWay</span>
+                </div>
+              </div>
+              <nav className='flex flex-col space-y-4'>
+                <Link
+                  href='/store'
+                  onClick={() => setIsOpen(false)}
+                  className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                >
+                  Store
+                </Link>
+                <Link
+                  href='/create-card'
+                  onClick={() => setIsOpen(false)}
+                  className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                >
+                  Create Card
+                </Link>
+                <Link
+                  href='/games'
+                  onClick={() => setIsOpen(false)}
+                  className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                >
+                  Games
+                </Link>
+                <Link
+                  href='/news'
+                  onClick={() => setIsOpen(false)}
+                  className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                >
+                  News
+                </Link>
+                <Link
+                  href='/about'
+                  onClick={() => setIsOpen(false)}
+                  className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                >
+                  About
+                </Link>
+                <Link
+                  href='/contact'
+                  onClick={() => setIsOpen(false)}
+                  className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                >
+                  Contact
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {/* Logo Section */}
         <div className='flex items-center space-x-4'>
           <Link href='/' className='flex items-center space-x-3 hover:opacity-90 transition-opacity'>
@@ -81,74 +151,6 @@ export function Navbar() {
             Contact
           </Link>
         </nav>
-
-        {/* Mobile Menu */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant='ghost' size='sm' className='md:hidden h-9 w-9 p-0 mr-2'>
-              <Menu className='h-4 w-4' />
-              <span className='sr-only'>Toggle menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side='left' className='w-80'>
-            <div className='flex items-center space-x-3 mb-8'>
-              <Image
-                src='/images/logo.png'
-                alt='NoTrumpNWay Logo'
-                width={32}
-                height={32}
-                className='rounded-lg'
-              />
-              <div>
-                <span className='text-lg font-bold'>NoTrumpNWay</span>
-              </div>
-            </div>
-            <nav className='flex flex-col space-y-4'>
-              <Link
-                href='/store'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-              >
-                Store
-              </Link>
-              <Link
-                href='/create-card'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-              >
-                Create Card
-              </Link>
-              <Link
-                href='/games'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-              >
-                Games
-              </Link>
-              <Link
-                href='/news'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-              >
-                News
-              </Link>
-              <Link
-                href='/about'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-              >
-                About
-              </Link>
-              <Link
-                href='/contact'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center text-sm font-medium p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-              >
-                Contact
-              </Link>
-            </nav>
-          </SheetContent>
-        </Sheet>
 
         {/* Desktop Right Side */}
         <div className='hidden md:flex items-center space-x-3'>
@@ -220,7 +222,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile Right Side */}
-        <div className='flex md:hidden items-center space-x-2'>
+        <div className='flex md:hidden items-center space-x-2 ml-auto'>
           <Button
             variant='ghost'
             size='sm'
