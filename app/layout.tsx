@@ -5,8 +5,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CartProvider } from "@/contexts/cart-context";
 import { FavoritesProvider } from "@/contexts/favorites-context";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,11 +31,9 @@ export default function RootLayout({
             <CartProvider>
               <FavoritesProvider>
                 <div className="flex flex-col min-h-screen">
-                  <Navbar />
                   <main className="flex-1">
                     {children}
                   </main>
-                  <Footer />
                 </div>
               </FavoritesProvider>
             </CartProvider>
