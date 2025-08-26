@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -36,7 +36,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Newspaper className="h-6 w-6" />
-              <h2 className="text-xl font-bold">NOTRUMPNWAY: Latest Headlines</h2>
+              <h2 className="text-xl font-bold">TRUMP WATCH: Latest Headlines</h2>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm">Last updated: {lastUpdated}</span>
