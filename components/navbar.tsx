@@ -2,20 +2,24 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { ShoppingCart, Heart, Menu, X, Sun, Moon } from 'lucide-react'
 import { useCart } from '@/contexts/cart-context'
 import { useFavorites } from '@/contexts/favorites-context'
 import { useTheme } from '@/contexts/theme-context'
-import { ShoppingCart, Heart, Menu, X } from 'lucide-react'
 
 export default function Navbar() {
-  const { state } = useCart()
-  const { state: favoritesState } = useFavorites()
-  const { theme, toggleTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { items } = useCart()
+  const { favorites } = useFavorites()
+  const { theme, toggleTheme } = useTheme()
+
+  // Calculate total items in cart
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <nav className="bg-black text-white p-4 relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Mobile menu button */}
         <button
           className="md:hidden p-2 hover:bg-gray-800 rounded"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -24,10 +28,12 @@ export default function Navbar() {
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
+        {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-red-600 hover:text-red-500 transition-colors">
           TRUMP WATCH
         </Link>
 
+        {/* Desktop Navigation Links */}
         <div className="hidden md:flex space-x-8">
           <Link href="/" className="hover:text-red-400 transition-colors">
             Home
@@ -43,15 +49,22 @@ export default function Navbar() {
           </Link>
         </div>
 
+        {/* Right side icons */}
         <div className="flex items-center space-x-4">
+          {/* Theme toggle */}
           <button
             onClick={toggleTheme}
             className="p-2 hover:bg-gray-800 rounded transition-colors"
             aria-label="Switch theme"
           >
-            {theme === 'dark' ? '' : ''}
+            {theme === 'dark' ? (
+              <Sun size={24} className="text-yellow-400" />
+            ) : (
+              <Moon size={24} className="text-gray-300" />
+            )}
           </button>
 
+          {/* Favorites */}
           <Link
             href="/favorites"
             className="relative p-2 hover:bg-gray-800 rounded transition-colors"
@@ -59,30 +72,32 @@ export default function Navbar() {
           >
             <Heart 
               size={24} 
-              className={favoritesState.itemCount > 0 ? 'fill-red-500 text-red-500' : 'text-white'} 
+              className={favorites.length > 0 ? "text-red-500 fill-red-500" : "text-white"} 
             />
-            {favoritesState.itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {favoritesState.itemCount}
+            {favorites.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                {favorites.length}
               </span>
             )}
           </Link>
 
+          {/* Shopping Cart */}
           <Link
             href="/store/cart"
             className="relative p-2 hover:bg-gray-800 rounded transition-colors"
             aria-label="Shopping cart"
           >
             <ShoppingCart size={24} />
-            {state.itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {state.itemCount}
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                {totalItems}
               </span>
             )}
           </Link>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-black border-t border-gray-700 z-40">
           <div className="flex flex-col p-4 space-y-4">
