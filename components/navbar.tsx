@@ -29,22 +29,22 @@ export default function Navbar() {
         </button>
 
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-red-600 hover:text-red-500 transition-colors">
-          TRUMP WATCH
+        <Link href="/" className="text-2xl font-bold text-blue-400 hover:text-blue-300 transition-colors">
+          NOTRUMPNWAY
         </Link>
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex space-x-8">
-          <Link href="/" className="hover:text-red-400 transition-colors">
+          <Link href="/" className="hover:text-blue-400 transition-colors">
             Home
           </Link>
-          <Link href="/store" className="hover:text-red-400 transition-colors">
+          <Link href="/store" className="hover:text-blue-400 transition-colors">
             Store
           </Link>
-          <Link href="/about" className="hover:text-red-400 transition-colors">
+          <Link href="/about" className="hover:text-blue-400 transition-colors">
             About
           </Link>
-          <Link href="/contact" className="hover:text-red-400 transition-colors">
+          <Link href="/contact" className="hover:text-blue-400 transition-colors">
             Contact
           </Link>
         </div>
@@ -72,10 +72,10 @@ export default function Navbar() {
           >
             <Heart 
               size={24} 
-              className={favorites.length > 0 ? "text-red-500 fill-red-500" : "text-white"} 
+              className={favorites.length > 0 ? "text-blue-300 fill-red-500" : "text-white"} 
             />
             {favorites.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
                 {favorites.length}
               </span>
             )}
@@ -89,7 +89,7 @@ export default function Navbar() {
           >
             <ShoppingCart size={24} />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
                 {totalItems}
               </span>
             )}
@@ -103,28 +103,28 @@ export default function Navbar() {
           <div className="flex flex-col p-4 space-y-4">
             <Link
               href="/"
-              className="hover:text-red-400 transition-colors py-2"
+              className="hover:text-blue-400 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link
               href="/store"
-              className="hover:text-red-400 transition-colors py-2"
+              className="hover:text-blue-400 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Store
             </Link>
             <Link
               href="/about"
-              className="hover:text-red-400 transition-colors py-2"
+              className="hover:text-blue-400 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               About
             </Link>
             <Link
               href="/contact"
-              className="hover:text-red-400 transition-colors py-2"
+              className="hover:text-blue-400 transition-colors py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Contact
