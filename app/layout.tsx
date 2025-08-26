@@ -1,11 +1,12 @@
 ﻿import { Inter } from "next/font/google"
 import "./globals.css"
+import SimpleNavbar from "@/components/simple-navbar"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "TRUMP WATCH",
-  description: "Stay informed with the latest updates",
+  title: "NoTrumpNWay - Create Cards, Games & Shop",
+  description: "Create witty political greeting cards, play games, and shop for merchandise",
 }
 
 export default function RootLayout({
@@ -17,11 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="min-h-screen">
-          <nav className="bg-black text-white p-4">
-            <div className="max-w-7xl mx-auto">
-              <h1 className="text-2xl font-bold text-red-600">TRUMP WATCH</h1>
-            </div>
-          </nav>
+          <SimpleNavbar />
           <main>
             {children}
           </main>
