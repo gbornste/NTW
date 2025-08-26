@@ -1,7 +1,4 @@
-﻿import { Inter } from "next/font/inter";
-import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+﻿import "./globals.css";
 
 export const metadata = {
   title: "NTW - Next Trade Web",
@@ -15,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true}>
         {children}
       </body>
     </html>
