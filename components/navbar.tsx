@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Menu, X, ShoppingCart, Heart, Sun, Moon, User } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
@@ -10,6 +10,8 @@ import { useTheme } from "@/contexts/theme-context"
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [lastUpdated, setLastUpdated] = useState('Loading...')
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   
   // Use contexts
   const { state: cartState } = useCart()
@@ -19,6 +21,20 @@ export default function Navbar() {
   useEffect(() => {
     setLastUpdated(new Date().toLocaleString())
   }, [])
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [userMenuOpen])
   
   const navigation = [
     { name: "News", href: "/news" },
@@ -113,13 +129,58 @@ export default function Navbar() {
               </Link>
 
               {/* User Menu */}
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="p-2 rounded-md text-gray-800 hover:text-blue-600 transition-colors duration-200"
                   aria-label="User menu"
                 >
                   <User size={20} />
                 </button>
+                
+                {/* Dropdown Menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
+                      <Link
+                        href="/auth/signin"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/auth/signup"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        Sign Up
+                      </Link>
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <hr className="my-1" />
+                      <button
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        role="menuitem"
+                        onClick={() => {
+                          setUserMenuOpen(false)
+                          // Add logout logic here
+                          console.log('Logout clicked')
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
