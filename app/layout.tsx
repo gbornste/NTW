@@ -3,6 +3,7 @@ import "./globals.css"
 import Navbar from "@/components/navbar"
 import { FavoritesProvider } from "@/contexts/favorites-context"
 import { CartProvider } from "@/contexts/cart-context"
+import { ThemeProvider } from "@/contexts/theme-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,16 +20,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CartProvider>
-          <FavoritesProvider>
-            <div className="min-h-screen">
-              <Navbar />
-              <main className="pt-16">
-                {children}
-              </main>
-            </div>
-          </FavoritesProvider>
-        </CartProvider>
+        <ThemeProvider>
+          <CartProvider>
+            <FavoritesProvider>
+              <div className="min-h-screen">
+                <Navbar />
+                <main className="pt-16">
+                  {children}
+                </main>
+              </div>
+            </FavoritesProvider>
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
