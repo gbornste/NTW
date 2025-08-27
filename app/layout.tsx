@@ -1,10 +1,6 @@
 ﻿import { Inter } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/navbar"
-import { CartProvider } from "@/contexts/cart-context"
-import { FavoritesProvider } from "@/contexts/favorites-context"
-import { ThemeProvider } from "@/contexts/theme-context"
-import { AuthProvider } from "@/contexts/auth-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,20 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <ThemeProvider>
-            <CartProvider>
-              <FavoritesProvider>
-                <div className="min-h-screen">
-                  <Navbar />
-                  <main>
-                    {children}
-                  </main>
-                </div>
-              </FavoritesProvider>
-            </CartProvider>
-          </ThemeProvider>
-        </AuthProvider>
+        <div className="min-h-screen">
+          <Navbar />
+          <main className="pt-16">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   )
