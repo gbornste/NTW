@@ -3,10 +3,18 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X, ShoppingCart, Heart, Sun, Moon, User } from "lucide-react"
+import { useCart } from "@/contexts/cart-context"
+import { useFavorites } from "@/contexts/favorites-context"
+import { useTheme } from "@/contexts/theme-context"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [lastUpdated, setLastUpdated] = useState('Loading...')
+  
+  // Use contexts
+  const { state: cartState } = useCart()
+  const { items: favoriteItems } = useFavorites()
+  const { theme, toggleTheme } = useTheme()
   
   useEffect(() => {
     setLastUpdated(new Date().toLocaleString())
@@ -69,10 +77,11 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-4">
               {/* Theme Toggle */}
               <button
+                onClick={toggleTheme}
                 className="p-2 rounded-md text-gray-800 hover:text-blue-600 transition-colors duration-200"
                 aria-label="Toggle theme"
               >
-                <Sun size={20} />
+                {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
               </button>
 
               {/* Favorites */}
@@ -82,9 +91,11 @@ export default function Navbar() {
                 aria-label="Favorites"
               >
                 <Heart size={20} />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
+                {favoriteItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {favoriteItems.length}
+                  </span>
+                )}
               </Link>
 
               {/* Cart */}
@@ -94,9 +105,11 @@ export default function Navbar() {
                 aria-label="Shopping cart"
               >
                 <ShoppingCart size={20} />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
+                {cartState.itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartState.itemCount}
+                  </span>
+                )}
               </Link>
 
               {/* User Menu */}
@@ -146,7 +159,7 @@ export default function Navbar() {
                     onClick={() => setIsOpen(false)}
                   >
                     <Heart size={20} />
-                    <span>Favorites (0)</span>
+                    <span>Favorites ({favoriteItems.length})</span>
                   </Link>
                   
                   <Link
@@ -155,7 +168,7 @@ export default function Navbar() {
                     onClick={() => setIsOpen(false)}
                   >
                     <ShoppingCart size={20} />
-                    <span>Cart (0)</span>
+                    <span>Cart ({cartState.itemCount})</span>
                   </Link>
                 </div>
                 
