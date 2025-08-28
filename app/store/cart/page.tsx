@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React from 'react'
 import Image from 'next/image'
@@ -205,7 +205,7 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-xl shadow-lg mb-4">
+                <Button onClick={() => window.location.href = "/store/checkout"} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-xl shadow-lg mb-4">
                   <CreditCard className="h-6 w-6 mr-3" />
                   Proceed to Checkout
                 </Button>
