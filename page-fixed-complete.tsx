@@ -317,6 +317,15 @@ export default function ProductPage() {
   const handleAddToCart = async () => {
     if (!product || !selectedVariant) return
     
+    // Clear any previous error
+    setSizeError(null)
+    
+    // CRITICAL: Validate that a size is selected
+    if (!selectedSize || selectedSize.trim() === '') {
+      setSizeError('Please select a size before adding to cart')
+      return // STOP HERE - DO NOT ADD TO CART
+    }
+    
     setIsAddingToCart(true)
     
     try {

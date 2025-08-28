@@ -117,7 +117,6 @@ export default function ProductPage() {
   const [shareMenuOpen, setShareMenuOpen] = useState(false)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
-  const [sizeError, setSizeError] = useState<string | null>(null)
 
   const isFav = product ? isFavorite(product.id) : false
 
