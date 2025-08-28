@@ -607,7 +607,7 @@ export default function ProductPage() {
                 </div>
                 <div className="flex items-center gap-2 text-green-600">
                   <CheckCircle className="h-5 w-5" />
-                  <span className="font-medium">Free shipping on all orders  30-day returns</span>
+                  <span className="font-medium">Free shipping on all orders over $50  30-day returns</span>
                 </div>
               </div>
             </div>

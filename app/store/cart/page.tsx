@@ -213,7 +213,7 @@ export default function CartPage() {
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Truck className="h-5 w-5 text-green-600" />
-                    <span>Free shipping on all orders</span>
+                    <span>Free shipping on all orders over $50</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Shield className="h-5 w-5 text-blue-600" />
