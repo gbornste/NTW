@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useCart } from "@/contexts/cart-context"
 import { Button } from "@/components/ui/button"
@@ -31,7 +31,7 @@ interface PaymentInfo {
 }
 
 export default function CheckoutPage() {
-  const { items, getTotalPrice, clearCart } = useCart()
+  const { state, clearCart } = useCart(); const { items } = state
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState("")
@@ -55,7 +55,7 @@ export default function CheckoutPage() {
     nameOnCard: ""
   })
 
-  const subtotal = getTotalPrice()
+  const subtotal = state.total
   const shipping = subtotal >= 50 ? 0 : 9.99
   const tax = subtotal * 0.08
   const total = subtotal + shipping + tax
@@ -372,3 +372,4 @@ export default function CheckoutPage() {
     </div>
   )
 }
+
