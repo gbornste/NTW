@@ -8,6 +8,7 @@ export interface PrintifyProduct {
   variants: PrintifyVariant[]
   options: PrintifyOption[]
   tags: string[]
+  blueprint_id: number
   created_at: string
   updated_at: string
 }
@@ -347,6 +348,7 @@ export class PrintifyService {
       variants: this.transformVariants(product.variants || []),
       options: this.transformOptions(product.options || []),
       tags: product.tags || [],
+      blueprint_id: product.blueprint_id || 5, // Default to t-shirt blueprint if not provided
       created_at: product.created_at,
       updated_at: product.updated_at,
     }
@@ -417,7 +419,7 @@ export class PrintifyService {
               return cleaned
             })
             .filter(Boolean)
-            .filter((value) => value !== "Option") // Remove generic fallbacks
+            .filter((value: string) => value !== "Option") // Remove generic fallbacks
         : []
 
       return {
@@ -478,6 +480,7 @@ export class PrintifyService {
         title: "Anti-Trump Climate Action T-Shirt",
         description:
           "Stand up for climate action and against Trump's environmental policies with this premium cotton t-shirt. Made from 100% organic cotton, this comfortable and durable shirt features a bold design that makes a statement about protecting our planet. Perfect for rallies, protests, or everyday wear to show your commitment to environmental justice.",
+        blueprint_id: 5, // T-shirt blueprint
         images: [
           {
             src: "/political-t-shirt.png",
@@ -576,6 +579,7 @@ export class PrintifyService {
         title: "Science Over Politics Coffee Mug",
         description:
           "Start your morning with a statement supporting science and evidence-based policy making. This high-quality ceramic mug features a durable design that won't fade after multiple washes. Perfect for coffee, tea, or any hot beverage while you contemplate the importance of scientific literacy in modern politics.",
+        blueprint_id: 384, // Mug blueprint
         images: [
           {
             src: "/political-mug.png",
@@ -621,6 +625,7 @@ export class PrintifyService {
         title: "Democracy Defender Hat",
         description:
           "Show your support for democratic values with this comfortable adjustable baseball cap. Made from high-quality cotton twill with an adjustable strap, this hat is perfect for outdoor events, rallies, or everyday wear. The embroidered design is built to last and won't fade or peel over time.",
+        blueprint_id: 71, // Hat blueprint
         images: [
           {
             src: "/blue-hat-anti-trump.png",
@@ -679,6 +684,7 @@ export class PrintifyService {
         title: "Climate Change is Real Bumper Sticker",
         description:
           "Spread awareness about climate change with this durable, weather-resistant bumper sticker. Made from high-quality vinyl that can withstand harsh weather conditions, UV rays, and car washes. Easy to apply and remove without leaving residue. Perfect for cars, laptops, water bottles, or any smooth surface.",
+        blueprint_id: 8, // Sticker blueprint (using a generic accessories blueprint)
         images: [
           {
             src: "/climate-change-bumper-sticker.png",
@@ -716,6 +722,7 @@ export class PrintifyService {
         title: "Vote Blue Political Backpack",
         description:
           "Carry your essentials while showing your political stance with this durable backpack. Features multiple compartments, padded laptop sleeve, and comfortable adjustable straps. Made from water-resistant material to protect your belongings. Perfect for school, work, travel, or political events.",
+        blueprint_id: 12, // Bags blueprint (using a generic bags blueprint)
         images: [
           {
             src: "/anti-trump-backpack.png",
@@ -753,6 +760,7 @@ export class PrintifyService {
         title: "Progressive Politics Jersey",
         description:
           "Sport your progressive values with this comfortable athletic jersey. Made from moisture-wicking fabric that keeps you cool and dry during activities. Features a modern fit and durable construction that maintains its shape after multiple washes. Perfect for sports, workouts, or casual wear.",
+        blueprint_id: 17, // Tank/Jersey blueprint
         images: [
           {
             src: "/anti-trump-jersey.png",
@@ -814,6 +822,7 @@ export class PrintifyService {
         title: "Anti-Trump Statement Mug",
         description:
           "Make your morning coffee a political statement with this bold ceramic mug. Features a striking design that won't fade or chip with regular use. Dishwasher and microwave safe for convenience. Perfect for home, office, or as a gift for like-minded friends and family.",
+        blueprint_id: 384, // Mug blueprint
         images: [
           {
             src: "/anti-trump-mug.png",
@@ -859,6 +868,7 @@ export class PrintifyService {
         title: "Political Activism Mousepad",
         description:
           "Keep your political message visible while you work with this high-quality mousepad. Features a smooth surface for precise mouse tracking and a non-slip rubber base that stays in place. Durable design that resists wear and fading. Perfect for home office, work, or as a conversation starter.",
+        blueprint_id: 15, // Mousepad blueprint (using a generic accessories blueprint)
         images: [
           {
             src: "/anti-trump-mousepad.png",
