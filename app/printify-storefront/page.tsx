@@ -128,7 +128,7 @@ export default function PrintifyStorefrontPage() {
             const transformedVariants = (product.variants || []).map((variant: any) => ({
               ...variant,
               id: String(variant.id),
-              price: typeof variant.price === "number" && variant.price > 100 ? variant.price / 100 : variant.price,
+              price: typeof variant.price === "number" && variant.price > 100 ? variant.price : variant.price,
             }))
 
             // Ensure images array exists and has valid sources
@@ -159,14 +159,14 @@ export default function PrintifyStorefrontPage() {
             return null
           }
         })
-        .filter((product): product is Product => product !== null)
+        .filter((product: Product | null): product is Product => product !== null)
 
       console.log(`✅ Transformed ${transformedProducts.length} valid products`)
       setProducts(transformedProducts)
 
       // Extract unique categories from product tags, excluding MOCK-DATA tag
-      const allTags = transformedProducts.flatMap((product) => product.tags.filter((tag) => tag !== "MOCK-DATA"))
-      const uniqueCategories = Array.from(new Set(allTags)).sort()
+      const allTags: string[] = transformedProducts.flatMap((product: Product) => product.tags.filter((tag): tag is string => typeof tag === 'string' && tag !== "MOCK-DATA"))
+      const uniqueCategories: string[] = Array.from(new Set(allTags)).sort()
       setCategories(uniqueCategories)
     } catch (err) {
       console.error("❌ Error fetching products:", err)
