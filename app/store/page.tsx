@@ -118,8 +118,8 @@ export default function StorePage() {
       }
 
       // Transform and validate products
-      const transformedProducts = data.data
-        .map((product: any, index: number) => {
+      const transformedProducts: Product[] = data.data
+        .map((product: any, index: number): Product | null => {
           try {
             // Validate required fields
             if (!product.id || !product.title) {
@@ -154,7 +154,7 @@ export default function StorePage() {
               ...product,
               variants: transformedVariants,
               images: transformedImages,
-              tags: product.tags || [],
+              tags: Array.isArray(product.tags) ? product.tags : [],
               description: product.description || "No description available",
             }
           } catch (err) {
@@ -162,14 +162,16 @@ export default function StorePage() {
             return null
           }
         })
-        .filter((product): product is Product => product !== null)
+        .filter((product: Product | null): product is Product => product !== null)
 
       console.log(`✅ Transformed ${transformedProducts.length} valid products`)
       setProducts(transformedProducts)
 
       // Extract unique categories from product tags, excluding MOCK-DATA tag
-      const allTags = transformedProducts.flatMap((product) => product.tags.filter((tag) => tag !== "MOCK-DATA"))
-      const uniqueCategories = Array.from(new Set(allTags)).sort()
+      const allTags = transformedProducts.flatMap((product: Product) => 
+        product.tags.filter((tag: string) => tag !== "MOCK-DATA")
+      )
+      const uniqueCategories: string[] = Array.from(new Set(allTags)).sort()
       setCategories(uniqueCategories)
     } catch (err) {
       console.error("❌ Error fetching products:", err)

@@ -45,6 +45,19 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       optionsCount: processedProduct.options.length,
       dataSource: processedProduct.dataSource,
     })
+    
+    // Debug first variant structure for frontend
+    if (processedProduct.variants.length > 0) {
+      console.log('🔍 FRONTEND DEBUG: First variant structure:', {
+        id: processedProduct.variants[0].id,
+        idType: typeof processedProduct.variants[0].id,
+        options: processedProduct.variants[0].options,
+        hasSize: !!(processedProduct.variants[0].options?.size || processedProduct.variants[0].options?.Size),
+        hasSizeProperty: 'size' in (processedProduct.variants[0].options || {}),
+        hasSizeUpperProperty: 'Size' in (processedProduct.variants[0].options || {}),
+        sizeValue: processedProduct.variants[0].options?.size || processedProduct.variants[0].options?.Size
+      })
+    }
 
     return NextResponse.json(processedProduct)
   } catch (error) {
