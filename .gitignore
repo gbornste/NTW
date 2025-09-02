@@ -33,3 +33,7 @@ CTO_EMERGENCY_DEPLOYMENT_SUCCESS.md
 EMERGENCY_UI_DESIGNER_SUCCESS_REPORT.md
 enhanced_product_page_code.txt
 app/store/product/[id]/page.enhanced.v1.tsx
+# Test and debug files
+*test*.js
+*debug*.js
+*diagnostic*.js
