@@ -175,11 +175,11 @@ export default function PrintifyDiagnosticsPage() {
               return null
             }
 
-            // Transform price from cents to dollars if needed
+            // Don't divide by 100 - prices are already in correct format
             const transformedVariants = (product.variants || []).map((variant: any) => ({
               ...variant,
               id: String(variant.id),
-              price: typeof variant.price === "number" && variant.price > 100 ? variant.price / 100 : variant.price,
+              price: typeof variant.price === "number" ? variant.price : variant.price,
             }))
 
             // Ensure images array exists

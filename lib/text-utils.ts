@@ -72,8 +72,8 @@ export function cleanOptionValue(value: any): string {
  * Format price for display
  */
 export function formatPrice(price: number): string {
-  // Handle price conversion (cents to dollars if needed)
-  const priceInDollars = price > 100 ? price / 100 : price
+  // Convert cents to dollars by dividing by 100
+  const priceInDollars = price / 100
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
