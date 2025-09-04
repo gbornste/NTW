@@ -10,23 +10,23 @@ const DEFAULT_RSS_FEED = RSS_FEEDS.length > 0 ? RSS_FEEDS[0].url : ""
 const parser = new Parser({
   customFields: {
     item: [
-      ["media:content", "mediaContent", { keepArray: true }],
-      ["media:group", "mediaGroup"],
-      ["media:thumbnail", "mediaThumbnail", { keepArray: true }],
-      ["dc:creator", "creator"],
-      ["dc:date", "dcDate"],
-      ["content:encoded", "contentEncoded"],
-      ["description", "description"],
-      ["pubDate", "pubDate"],
-      ["published", "published"],
-      ["updated", "updated"],
-    ],
+      "media:content",
+      "media:group", 
+      "media:thumbnail",
+      "dc:creator",
+      "dc:date",
+      "content:encoded",
+      "description",
+      "pubDate",
+      "published", 
+      "updated"
+    ] as any,
     feed: [
-      ["image", "feedImage"],
-      ["logo", "feedLogo"],
-      ["lastBuildDate", "lastBuildDate"],
-      ["updated", "updated"],
-    ],
+      "image",
+      "logo", 
+      "lastBuildDate",
+      "updated"
+    ] as any,
   },
   headers: {
     "User-Agent": "NoTrumpNWay RSS Reader/1.0",
@@ -37,7 +37,7 @@ const parser = new Parser({
   },
   timeout: 15000,
   requestOptions: {
-    cache: "no-store",
+    // cache: "no-store", // Remove cache option that doesn't exist in RequestOptions
   },
 })
 
@@ -109,7 +109,7 @@ export class RSSService {
         const timestamp = parseDate(item)
 
         return {
-          id: item.guid || item.id || `${feedUrl}-${index}-${Date.now()}`,
+          id: item.guid || (item as any).id || `${feedUrl}-${index}-${Date.now()}`,
           title: item.title?.trim() || "No title",
           link: item.link || "",
           pubDate: item.pubDate || item.published || item.updated || item.dcDate || new Date().toISOString(),
@@ -188,7 +188,7 @@ export class RSSService {
       return {
         items: [],
         lastUpdated: new Date().toISOString(),
-        error: error instanceof Error ? error.message : "Unknown error",
+        errors: [error instanceof Error ? error.message : "Unknown error"],
       }
     }
   }

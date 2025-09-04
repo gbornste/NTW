@@ -50,14 +50,14 @@ export default function ModulesDebugPage() {
   const testSafeImport = async (modulePath: string) => {
     try {
       const defaultExport = await SafeImport.getDefaultExport(modulePath)
-      const namedExports = await SafeImport.importWithFallback(modulePath)
+      const moduleResult = await SafeImport.importModule(modulePath)
 
       setTestResults((prev) => ({
         ...prev,
         [modulePath]: {
           defaultExport: !!defaultExport,
           defaultType: typeof defaultExport,
-          namedExports: namedExports ? Object.keys(namedExports).filter((k) => k !== "default") : [],
+          namedExports: moduleResult?.namedExports ? Object.keys(moduleResult.namedExports).filter((k) => k !== "default") : [],
           success: true,
         },
       }))

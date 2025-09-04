@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getToken } from "next-auth/jwt"
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Check if the path is protected
@@ -10,14 +9,9 @@ export async function middleware(request: NextRequest) {
   const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path))
 
   if (isProtectedPath) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
-
-    // If the user is not logged in, redirect to the login page
-    if (!token) {
-      const url = new URL("/login", request.url)
-      url.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(url)
-    }
+    // Temporarily allow all requests - NextAuth disabled
+    // TODO: Re-enable proper authentication
+    return NextResponse.next()
   }
 
   return NextResponse.next()

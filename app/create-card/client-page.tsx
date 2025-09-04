@@ -1,14 +1,21 @@
 "use client"
+import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Palette, Eye, Send } from "lucide-react"
 import { AuthStatusIndicator } from "@/app/components/auth-status-indicator"
 
 const CARD_TEMPLATES = [
-  // ... (same template data as before)
+  // Template data would go here
 ]
 
 export default function CreateCardPage() {
-  // ... (same state and effect logic as before)
+  const [activeTab, setActiveTab] = useState("design")
+  const [cardText, setCardText] = useState("")
+  const [currentTemplate, setCurrentTemplate] = useState(null)
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+  }
 
   return (
     <div className="container py-10 px-4 md:px-6">

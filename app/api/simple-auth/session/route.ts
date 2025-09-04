@@ -7,8 +7,8 @@ export async function GET(request: NextRequest) {
   try {
     console.log("🔍 API: Checking session...")
 
-    const cookieStore = cookies()
-    const sessionCookie = cookieStore.get("session")
+    const cookieStore = await cookies()
+    const sessionCookie = await cookieStore.get("session")
 
     if (!sessionCookie) {
       console.log("❌ API: No session cookie found")

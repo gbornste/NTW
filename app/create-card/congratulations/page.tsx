@@ -76,7 +76,6 @@ export default function CongratulationsCardPage() {
           </Button>
           <CardSendingInterface
             cardData={cardData}
-            user={{ firstName: senderName }}
             onSendComplete={() => {
               // Handle successful send
             }}

@@ -5,11 +5,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { RefreshCw, TrendingUp, TrendingDown, Clock } from "lucide-react"
-import { fetchTrumpAffectedStocks } from "../actions/fetch-stocks"
+import { fetchTrumpAffectedStocks, StockData } from "../actions/fetch-stocks"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 export default function StocksPage() {
-  const [stocks, setStocks] = useState([])
+  const [stocks, setStocks] = useState<StockData[]>([])
   const [lastUpdated, setLastUpdated] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [autoRefresh, setAutoRefresh] = useState(true)
@@ -31,7 +31,7 @@ export default function StocksPage() {
     loadStocks()
 
     // Set up auto-refresh interval if enabled
-    let intervalId
+    let intervalId: NodeJS.Timeout | undefined
     if (autoRefresh) {
       intervalId = setInterval(() => {
         loadStocks()
@@ -44,17 +44,17 @@ export default function StocksPage() {
   }, [autoRefresh])
 
   // Format price with dollar sign and 2 decimal places
-  const formatPrice = (price) => {
+  const formatPrice = (price: number) => {
     return `$${price.toFixed(2)}`
   }
 
   // Format change with plus or minus sign and 2 decimal places
-  const formatChange = (change) => {
+  const formatChange = (change: number) => {
     return change >= 0 ? `+${change.toFixed(2)}` : `${change.toFixed(2)}`
   }
 
   // Format percent change with plus or minus sign and 2 decimal places
-  const formatPercentChange = (percentChange) => {
+  const formatPercentChange = (percentChange: number) => {
     return percentChange >= 0 ? `+${percentChange.toFixed(2)}%` : `${percentChange.toFixed(2)}%`
   }
 
@@ -70,7 +70,7 @@ export default function StocksPage() {
   const olderStocks = stocks.filter((stock) => stock.date !== todayDate)
 
   // Stock card component to avoid duplication
-  const StockCard = ({ stock }) => (
+  const StockCard = ({ stock }: { stock: StockData }) => (
     <Card key={stock.symbol} className="overflow-hidden">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
@@ -119,8 +119,8 @@ export default function StocksPage() {
               />
               <YAxis domain={["auto", "auto"]} />
               <Tooltip
-                formatter={(value) => [`$${value.toFixed(2)}`, "Price"]}
-                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                formatter={(value) => [`$${Number(value).toFixed(2)}`, "Price"]}
+                labelFormatter={(date) => new Date(String(date)).toLocaleDateString()}
               />
               <Line
                 type="monotone"

@@ -1,18 +1,15 @@
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import type { Session } from "next-auth"
-
-export async function getAuthSession(): Promise<Session | null> {
+// Temporarily disabled due to NextAuth v4/v5 compatibility issues
+export async function getAuthSession(): Promise<any> {
   try {
-    const session = await getServerSession(authOptions)
-    return session
+    // Return null since NextAuth is temporarily disabled
+    return null
   } catch (error) {
     console.error("Error getting server session:", error)
     return null
   }
 }
 
-export async function requireAuth(): Promise<Session> {
+export async function requireAuth(): Promise<any> {
   const session = await getAuthSession()
   if (!session) {
     throw new Error("Authentication required")

@@ -8,8 +8,19 @@ import { Badge } from "@/components/ui/badge"
 import { fetchLatestHeadlines } from "../actions/fetch-headlines"
 import { RefreshCw } from "lucide-react"
 
+interface Article {
+  id: string
+  title: string
+  excerpt: string
+  category: string
+  image: string
+  date: string
+  content?: string
+  source?: string
+}
+
 export default function NewsPage() {
-  const [headlines, setHeadlines] = useState([])
+  const [headlines, setHeadlines] = useState<Article[]>([])
   const [lastUpdated, setLastUpdated] = useState("")
   const [isLoading, setIsLoading] = useState(true)
 
@@ -31,7 +42,7 @@ export default function NewsPage() {
   }, [])
 
   // Function to get the appropriate image for a headline based on category
-  function getHeadlineImage(headline) {
+  function getHeadlineImage(headline: Article) {
     switch (headline.category) {
       case "Economy":
         return "/images/economy-globe.png"

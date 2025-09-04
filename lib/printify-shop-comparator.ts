@@ -77,6 +77,8 @@ export class PrintifyShopComparator {
       id: shopId,
       accessible: false,
       errors: [] as string[],
+      data: undefined as any,
+      products: [] as any[],
     }
 
     try {

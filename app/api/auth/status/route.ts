@@ -4,8 +4,8 @@ import { cookies } from "next/headers"
 export async function GET(request: NextRequest) {
   try {
     // Check for session cookie
-    const cookieStore = cookies()
-    const sessionCookie = cookieStore.get("session")
+    const cookieStore = await cookies()
+    const sessionCookie = await cookieStore.get("session")
 
     // Check localStorage via request headers (if client sent them)
     const authHeader = request.headers.get("x-auth-status")

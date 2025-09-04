@@ -1,5 +1,71 @@
 
 "use server"
+
+import mysql from "mysql2/promise"
+import bcrypt from "bcryptjs"
+
+// Missing exports that are imported elsewhere
+export async function createUser(userData: any) {
+  throw new Error("createUser is not implemented. Please implement this function.")
+}
+
+export async function getUserByEmail(email: string) {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    })
+
+    const [rows] = await connection.execute(
+      "SELECT * FROM users WHERE UserEmail = ?",
+      [email]
+    )
+    await connection.end()
+
+    if ((rows as any[]).length === 0) {
+      return null
+    }
+
+    const user = (rows as any)[0]
+    return {
+      id: user.UserID,
+      email: user.UserEmail,
+      name: `${user.FName || ''} ${user.LName || ''}`.trim(),
+      firstName: user.FName,
+      lastName: user.LName,
+    }
+  } catch (error) {
+    console.error("Error getting user by email:", error)
+    return null
+  }
+}
+
+export async function debugListUsers() {
+  return [] // Return empty array instead of throwing error
+}
+
+export async function verifyUserEmail(email: string, code: string) {
+  return { success: false, error: "verifyUserEmail is not implemented. Please implement this function." }
+}
+
+export async function resendVerificationCode(email: string) {
+  return { 
+    success: false, 
+    error: "resendVerificationCode is not implemented. Please implement this function.",
+    verificationCode: "123456" // Demo code for now
+  }
+}
+
+export async function verifyUserAccount(email: string, pin: string) {
+  return { success: false, error: "verifyUserAccount is not implemented. Please implement this function." }
+}
+
+export async function resendVerificationPin(email: string) {
+  return { success: false, error: "resendVerificationPin is not implemented. Please implement this function." }
+}
+
 // Stub implementation for updateUserProfile
 export async function updateUserProfile(profileData: any) {
   if (!profileData || !profileData.id) {
@@ -43,9 +109,6 @@ export async function updateUserProfile(profileData: any) {
 export async function updateUserPassword(userId: any, newPassword: string) {
   throw new Error("updateUserPassword is not implemented. Please implement this function.");
 }
-
-import mysql from "mysql2/promise"
-import bcrypt from "bcryptjs"
 
 export async function loginUser(email: string, password: string) {
   try {

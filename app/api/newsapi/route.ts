@@ -40,7 +40,7 @@ export async function GET(request: Request) {
         if (!query) {
           return NextResponse.json({ error: "Query parameter 'q' is required for search" }, { status: 400 })
         }
-        data = await searchNews(query, from, to, sources, useCache)
+        data = await searchNews(query, from, to, sources || undefined, useCache)
         break
       case "headlines":
       default:

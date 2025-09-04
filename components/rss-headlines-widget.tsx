@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { fetchAllRssFeeds, type RssFeedItem } from "@/app/actions/fetch-rss-feeds"
+import { fetchAllRssFeeds } from "@/app/actions/rss-actions"
+import type { RssFeedItem } from "@/lib/rss-types"
 import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -26,7 +27,9 @@ export function RssHeadlinesWidget() {
       const result = await fetchAllRssFeeds()
       setHeadlines(result.items.slice(0, 5)) // Only show top 5 headlines
       setLastUpdated(new Date().toLocaleString())
-      setError(result.error || null)
+      if (result.errors && result.errors.length > 0) {
+        setError("Some feeds failed to load")
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to load headlines")
     } finally {

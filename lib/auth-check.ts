@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react"
 
 export function useAuthCheck() {
-  const [authState, setAuthState] = useState({
+  const [authState, setAuthState] = useState<{
+    isChecking: boolean
+    isAuthenticated: boolean
+    user: any
+    error: any
+  }>({
     isChecking: true,
     isAuthenticated: false,
     user: null,

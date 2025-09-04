@@ -7,10 +7,21 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Share2 } from "lucide-react"
 import { fetchHeadlineById } from "@/app/actions/fetch-headlines"
 
+interface Article {
+  id: string
+  title: string
+  excerpt: string
+  category: string
+  image: string
+  date: string
+  content?: string
+  source?: string
+}
+
 export default function ArticlePage() {
   const params = useParams()
   const router = useRouter()
-  const [article, setArticle] = useState(null)
+  const [article, setArticle] = useState<Article | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -37,7 +48,7 @@ export default function ArticlePage() {
   }, [params.id, router])
 
   // Function to get the appropriate image for a headline based on category
-  function getHeadlineImage(headline) {
+  function getHeadlineImage(headline: Article) {
     switch (headline.category) {
       case "Economy":
         return "/images/economy-globe.png"
@@ -111,7 +122,7 @@ export default function ArticlePage() {
 
         <div
           className="prose prose-lg dark:prose-invert max-w-none mb-8"
-          dangerouslySetInnerHTML={{ __html: article.content }}
+          dangerouslySetInnerHTML={{ __html: article.content || "" }}
         />
 
         <div className="flex justify-between items-center border-t pt-6">

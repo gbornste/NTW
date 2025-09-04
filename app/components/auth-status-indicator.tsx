@@ -12,6 +12,13 @@ export function AuthStatusIndicator() {
   // ... (rest of the AuthStatusIndicator logic)
 
   return (
-    // ... (JSX for rendering the auth status)
+    <div className="p-4 border rounded bg-card">
+      <h3 className="font-semibold mb-2">Authentication Status</h3>
+      <div className="space-y-2">
+        <div>Loading: {isLoading ? "Yes" : "No"}</div>
+        <div>Authenticated: {isAuthenticated ? "Yes" : "No"}</div>
+        {user && <div>User: {user.email}</div>}
+      </div>
+    </div>
   )
 }

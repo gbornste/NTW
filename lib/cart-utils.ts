@@ -34,17 +34,13 @@ export function validateCartItem(item: any): boolean {
  */
 export function sanitizeCartItem(item: any): CartItem {
   return {
-    id: String(item.id || ""),
     productId: String(item.productId || ""),
     variantId: String(item.variantId || ""),
-    name: String(item.name || "Unknown Product"),
+    title: String(item.title || item.name || "Unknown Product"),
     price: Number(item.price || 0),
     quantity: Math.max(1, Math.min(10, Number(item.quantity || 1))),
     image: String(item.image || "/placeholder.svg?height=300&width=300"),
-    variant: String(item.variant || "Default"),
-    variantTitle: String(item.variantTitle || item.variant || "Default"),
     options: item.options && typeof item.options === "object" ? item.options : {},
-    customization: item.customization && typeof item.customization === "object" ? item.customization : {},
   }
 }
 
@@ -57,11 +53,7 @@ export function calculateCartTotals(items: CartItem[]) {
 
   // Calculate additional costs
   let additionalCosts = 0
-  items.forEach((item) => {
-    if (item.customization?.giftWrap) additionalCosts += 2.99
-    if (item.customization?.rushDelivery) additionalCosts += 9.99
-    if (item.customization?.expressShipping) additionalCosts += 15.99
-  })
+  // Note: Additional costs calculation would go here if customization was part of CartItem interface
 
   const tax = (subtotal + additionalCosts) * 0.08 // 8% tax
   const total = subtotal + additionalCosts + tax

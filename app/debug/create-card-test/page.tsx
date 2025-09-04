@@ -8,12 +8,12 @@ import { CheckCircle, XCircle, AlertCircle, RefreshCw, User, LogIn, UserPlus } f
 import Link from "next/link"
 
 // Safe imports with fallbacks
-let useAuth
+let useAuth: any
 try {
   const authModule = require("@/contexts/simple-auth-context")
   useAuth = authModule.useAuth
-} catch (error) {
-  console.warn("Auth context not available:", error.message)
+} catch (error: any) {
+  console.warn("Auth context not available:", error?.message || "Unknown error")
   useAuth = () => ({
     isAuthenticated: false,
     user: null,
@@ -23,9 +23,9 @@ try {
 }
 
 export default function CreateCardTestPage() {
-  const [diagnostics, setDiagnostics] = useState(null)
+  const [diagnostics, setDiagnostics] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   const { isAuthenticated, user, isLoading: authLoading, refreshSession } = useAuth()
 
@@ -44,15 +44,15 @@ export default function CreateCardTestPage() {
       }
       const data = await response.json()
       setDiagnostics(data)
-    } catch (err) {
-      setError(err.message)
+    } catch (err: any) {
+      setError(err?.message || "Diagnostics error occurred")
       console.error("Diagnostics error:", err)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const StatusIcon = ({ status }) => {
+  const StatusIcon = ({ status }: { status: boolean | string }) => {
     if (status === true) return <CheckCircle className="h-5 w-5 text-green-500" />
     if (status === false) return <XCircle className="h-5 w-5 text-red-500" />
     return <AlertCircle className="h-5 w-5 text-yellow-500" />
@@ -146,10 +146,10 @@ export default function CreateCardTestPage() {
               <CardTitle>Environment Variables</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {Object.entries(diagnostics.environment || {}).map(([key, value]) => (
+              {Object.entries(diagnostics?.environment || {}).map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between">
                   <span className="font-mono text-sm">{key}:</span>
-                  <StatusIcon status={value} />
+                  <StatusIcon status={Boolean(value)} />
                   <span className="text-sm text-gray-500">{value ? "Set" : "Missing"}</span>
                 </div>
               ))}
@@ -164,10 +164,10 @@ export default function CreateCardTestPage() {
               <CardTitle>Module Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {Object.entries(diagnostics.modules || {}).map(([key, value]) => (
+              {Object.entries(diagnostics?.modules || {}).map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between">
                   <span>{key}:</span>
-                  <StatusIcon status={value} />
+                  <StatusIcon status={Boolean(value)} />
                   <span className="text-sm text-gray-500">{value ? "Available" : "Missing"}</span>
                 </div>
               ))}
@@ -209,7 +209,7 @@ export default function CreateCardTestPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {diagnostics.diagnostics.recommendations.map((rec, index) => (
+              {diagnostics.diagnostics.recommendations.map((rec: string, index: number) => (
                 <li key={index} className="flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
                   <span className="text-sm">{rec}</span>

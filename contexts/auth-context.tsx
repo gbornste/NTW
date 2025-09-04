@@ -17,6 +17,9 @@ interface AuthContextType {
   loginDemo: () => Promise<void>
   logout: () => Promise<void>
   signup: (email: string, password: string, name: string) => Promise<void>
+  refreshSession: () => Promise<void>
+  checkSession: () => Promise<void>
+  status: "authenticated" | "unauthenticated" | "loading"
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -171,6 +174,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  const refreshSession = async () => {
+    console.log("🔄 Refreshing session...")
+    await checkAuthStatus()
+  }
+
+  const checkSession = async () => {
+    console.log("🔍 Checking session...")
+    await checkAuthStatus()
+  }
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -179,6 +192,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loginDemo,
     logout,
     signup,
+    refreshSession,
+    checkSession,
+    status: isLoading ? "loading" : !!user ? "authenticated" : "unauthenticated",
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -44,8 +44,8 @@ export async function requestPasswordReset(email: string) {
 // Verify a reset token
 export async function verifyResetToken(token: string) {
   try {
-    const isValid = await validateResetToken(token)
-    return { valid: isValid }
+    const tokenData = await validateResetToken(token)
+    return { valid: !!tokenData }
   } catch (error) {
     console.error("Error verifying reset token:", error)
     return { valid: false }

@@ -32,11 +32,11 @@ export async function GET() {
         ],
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
       {
         status: "error",
-        error: error.message,
+        error: error?.message || "Unknown error occurred",
         timestamp: new Date().toISOString(),
       },
       { status: 500 },

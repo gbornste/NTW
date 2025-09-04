@@ -10,6 +10,20 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { RefreshCw, AlertCircle, Calendar, Clock, ExternalLink, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+interface NewsArticle {
+  title: string
+  description?: string
+  url: string
+  urlToImage?: string
+  publishedAt: string
+  source: {
+    name: string
+  }
+  formattedDate?: string
+  dateVerified?: boolean
+  isToday?: boolean
+}
+
 interface EnhancedNewsDisplayProps {
   title?: string
   subtitle?: string
@@ -25,10 +39,10 @@ export function EnhancedNewsDisplay({
   query = "",
   showDateVerification = true,
 }: EnhancedNewsDisplayProps) {
-  const [news, setNews] = useState([])
+  const [news, setNews] = useState<NewsArticle[]>([])
   const [lastUpdated, setLastUpdated] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [todayDate] = useState("2025-05-22") // Today's date
 
   async function loadNews(refresh = false) {
@@ -56,7 +70,7 @@ export function EnhancedNewsDisplay({
       }
     } catch (err) {
       console.error("Failed to fetch news:", err)
-      setError(err.message || "Failed to fetch news")
+      setError(err instanceof Error ? err.message : "Failed to fetch news")
     } finally {
       setIsLoading(false)
     }
@@ -67,7 +81,7 @@ export function EnhancedNewsDisplay({
   }, [type, query])
 
   // Get appropriate image based on source
-  function getSourceImage(source) {
+  function getSourceImage(source: string) {
     switch (source.toLowerCase()) {
       case "cnn":
         return "/images/politics.png"

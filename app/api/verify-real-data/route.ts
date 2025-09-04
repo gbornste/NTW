@@ -27,7 +27,7 @@ export async function GET() {
     }
 
     // Test API connection
-    const headers = {
+    const headers: Record<string, string> = {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "User-Agent": "NoTrumpNWay-Store/1.0",

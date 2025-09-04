@@ -9,12 +9,12 @@ import { useTheme } from '@/contexts/theme-context'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { items } = useCart()
-  const { favorites } = useFavorites()
+  const { state } = useCart()
+  const { items: favorites } = useFavorites()
   const { theme, toggleTheme } = useTheme()
 
   // Calculate total items in cart
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
+  const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <nav className="bg-black text-white p-4 relative z-50">

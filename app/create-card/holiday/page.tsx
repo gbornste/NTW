@@ -64,10 +64,11 @@ export default function HolidayCardPage() {
     optionalNote,
     cardType: "holiday",
     fontStyle,
+    template: { name: "Holiday Card", image: "/political-holiday-card.png" },
   }
 
-  const handleSendComplete = (result: any) => {
-    console.log("Card sent successfully:", result)
+  const handleSendComplete = () => {
+    console.log("Card sent successfully")
     // Could redirect to a success page or show a success message
   }
 

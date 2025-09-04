@@ -56,7 +56,7 @@ export async function getTodayHeadlines() {
     console.log(`DIRECT API RESPONSE: Received ${data.articles?.length || 0} articles`)
 
     // Filter articles to only include those from today
-    const todayArticles = data.articles.filter((article) => {
+    const todayArticles = data.articles.filter((article: any) => {
       const articleDate = new Date(article.publishedAt).toISOString().split("T")[0]
       return articleDate === today
     })

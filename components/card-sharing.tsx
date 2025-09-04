@@ -81,7 +81,7 @@ function ValidationMessage({ message }: { message: string }) {
 }
 
 export function CardSharing({ cardData }: CardSharingProps) {
-  const { user } = useAuth() // Fixed hook usage
+  const { user, isAuthenticated } = useAuth() // Fixed hook usage
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
@@ -355,10 +355,11 @@ export function CardSharing({ cardData }: CardSharingProps) {
 
             {process.env.NODE_ENV !== "production" && (
               <FormValidationDebug
-                formData={formData}
-                errors={errors}
-                isValid={isFormValid}
-                isDemoEnabled={isDemoEnabled}
+                recipientName={formData.recipientName}
+                recipientEmail={formData.recipientEmail}
+                cardMessage={cardData.message || ""}
+                isAuthenticated={isAuthenticated}
+                isSending={false}
               />
             )}
           </div>
@@ -382,7 +383,7 @@ export function CardSharing({ cardData }: CardSharingProps) {
         {/* Email Preview Modal */}
         <EmailPreviewModal
           isOpen={showPreview}
-          onClose={() => setShowPreview(false)}
+          onOpenChange={setShowPreview}
           emailData={{
             recipientName: formData.recipientName || "Friend",
             recipientEmail: formData.recipientEmail || "recipient@example.com",
