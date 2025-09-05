@@ -56,7 +56,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         newItems = [...state.items, action.item]
       }
 
-      const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      const total = newItems.reduce((sum, item) => sum + ((item.price / 100) * item.quantity), 0)
       const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0)
 
       return {
@@ -74,7 +74,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           JSON.stringify(item.options) === JSON.stringify(action.options))
       )
 
-      const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      const total = newItems.reduce((sum, item) => sum + ((item.price / 100) * item.quantity), 0)
       const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0)
 
       return {
@@ -103,7 +103,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           : item
       )
 
-      const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      const total = newItems.reduce((sum, item) => sum + ((item.price / 100) * item.quantity), 0)
       const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0)
 
       return {
@@ -122,7 +122,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       }
 
     case 'LOAD_CART': {
-      const total = action.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      const total = action.items.reduce((sum, item) => sum + ((item.price / 100) * item.quantity), 0)
       const itemCount = action.items.reduce((sum, item) => sum + item.quantity, 0)
       
       return {
